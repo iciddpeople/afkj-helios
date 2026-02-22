@@ -147,6 +147,19 @@ button:active { background: #0284c7; }
 
 .error { color: #f87171; }
 
+.current-badge {
+  display: inline-block;
+  background: #10b981;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 #result {
   display: flex;
   flex-direction: row;
@@ -435,10 +448,10 @@ const MODES = {
           
           <h2 data-i18n="bossType">Boss Type</h2>
           <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-            <button id="btnEndboss" onclick="selectBossType('endboss')" style="padding: 12px; cursor: pointer; background: #4a9eff; color: white; border: 2px solid #4a9eff; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation;" data-i18n="endboss">Endboss</button>
+            <button id="btnEndboss" onclick="selectBossType('endboss')" style="padding: 12px; cursor: pointer; background: #4a9eff; color: white; border: 2px solid #4a9eff; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: flex; align-items: center; justify-content: center;"><span data-i18n="endboss">Endboss</span><span class="current-badge">CURRENT</span></button>
             
             <!-- Single miniboss button (for Verdshroom) -->
-            <button id="btnMiniboss" onclick="selectMiniboss()" style="padding: 12px; cursor: pointer; background: white; color: #333; border: 2px solid #ddd; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: none;" data-i18n="minibosses">Minibosses</button>
+            <button id="btnMiniboss" onclick="selectMiniboss()" style="padding: 12px; cursor: pointer; background: white; color: #333; border: 2px solid #ddd; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: none; align-items: center; justify-content: center;"><span data-i18n="minibosses">Minibosses</span></button>
             
             <!-- Miniboss dropdown (for maps with multiple different miniboss comps) -->
             <div id="minibossDropdownContainer" style="display: flex; flex-direction: column; gap: 5px;">
@@ -553,6 +566,12 @@ async function renderMode(mode) {
     
     // Setup miniboss selector (button vs dropdown based on map)
     populateMinibossDropdown();
+    
+    // Auto-load Endboss teams on page load (only on initial load)
+    const result = document.getElementById('result');
+    if (!result || result.innerHTML.trim() === '') {
+      selectBossType('endboss');
+    }
     
     // Set up boss overlay rendering when map image loads
     const battleMapImg = document.getElementById('battleMapImage');
@@ -1055,6 +1074,13 @@ function heroAllowed(hero) {
   return true;
 }
 
+// Clone/summon relationships: clone hero -> main hero
+// When clone is disabled, main hero should also be disabled
+const CLONE_RELATIONSHIPS = {
+  'Phraesto Clone': 'Phraesto',
+  'Zanie Turret': 'Zanie'
+};
+
 function renderHeroes() {
   const heroGrid = document.getElementById('heroGrid');
   if (!heroGrid) return;
@@ -1080,9 +1106,27 @@ function renderHeroes() {
     img.className = missingHeroes.has(hero.name) ? "missing" : "";
 
     img.onclick = () => {
-      missingHeroes.has(hero.name)
-        ? missingHeroes.delete(hero.name)
-        : missingHeroes.add(hero.name);
+      if (missingHeroes.has(hero.name)) {
+        // Enabling hero - remove from missing list
+        missingHeroes.delete(hero.name);
+        
+        // If enabling a clone/summon hero, also enable the main hero
+        if (CLONE_RELATIONSHIPS[hero.name]) {
+          const mainHero = CLONE_RELATIONSHIPS[hero.name];
+          missingHeroes.delete(mainHero);
+          console.log(`🔗 Clone logic: Enabled ${hero.name}, automatically enabled ${mainHero}`);
+        }
+      } else {
+        // Disabling hero - add to missing list
+        missingHeroes.add(hero.name);
+        
+        // If disabling a clone/summon hero, also disable the main hero
+        if (CLONE_RELATIONSHIPS[hero.name]) {
+          const mainHero = CLONE_RELATIONSHIPS[hero.name];
+          missingHeroes.add(mainHero);
+          console.log(`🔗 Clone logic: Disabled ${hero.name}, automatically disabled ${mainHero}`);
+        }
+      }
       renderAll();
     };
 
@@ -1424,16 +1468,38 @@ function hasOverlap(cs) {
 let selectedBossType = 'endboss';
 let selectedBoss = 'endboss';
 
+// Helper function to move the CURRENT badge to a specific button
+function moveCurrentBadge(targetButtonId) {
+  // Remove badge from all buttons
+  const allButtons = ['btnEndboss', 'btnMiniboss'];
+  allButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      const existingBadge = btn.querySelector('.current-badge');
+      if (existingBadge) existingBadge.remove();
+    }
+  });
+  
+  // Add badge to target button
+  const targetBtn = document.getElementById(targetButtonId);
+  if (targetBtn) {
+    const badge = document.createElement('span');
+    badge.className = 'current-badge';
+    badge.textContent = 'CURRENT';
+    targetBtn.appendChild(badge);
+  }
+}
+
 // Miniboss selector - button for Verdshroom, dropdown for others
 function populateMinibossDropdown() {
   const minibossBtn = document.getElementById('btnMiniboss');
   const minibossDropdown = document.getElementById('minibossDropdownContainer');
   const minibossSelector = document.getElementById('minibossSelector');
   
-  // Verdshroom uses single button, others use dropdown
+  // Hide miniboss button for Verdshroom (same teams as endboss, no separate miniboss comps)
   if (selectedMap === 'verdshroom') {
-    // Show button, hide dropdown
-    if (minibossBtn) minibossBtn.style.display = 'block';
+    // Hide both button and dropdown
+    if (minibossBtn) minibossBtn.style.display = 'none';
     if (minibossDropdown) minibossDropdown.style.display = 'none';
   } else {
     // Show dropdown, hide button
@@ -1511,6 +1577,9 @@ function selectBossType(type) {
     btn.style.borderColor = '#4a9eff';
   }
   
+  // Move CURRENT badge to endboss button
+  moveCurrentBadge('btnEndboss');
+  
   // Reset miniboss button and dropdown
   const minibossBtn = document.getElementById('btnMiniboss');
   const minibossSelector = document.getElementById('minibossSelector');
@@ -1546,12 +1615,18 @@ function selectMiniboss(value) {
       minibossBtn.style.color = 'white';
       minibossBtn.style.borderColor = '#4a9eff';
     }
+    
+    // Move CURRENT badge to miniboss button
+    moveCurrentBadge('btnMiniboss');
   } else {
     // Other maps: dropdown behavior
     if (!value) return;
     
     selectedBossType = 'miniboss';
     selectedBoss = value;
+    
+    // Remove badge from buttons when using dropdown
+    moveCurrentBadge(null);
   }
   
   // Deselect endboss button
@@ -1577,6 +1652,9 @@ function selectStronghold(value) {
   
   selectedBossType = 'stronghold';
   selectedBoss = value;
+  
+  // Remove badge when using dropdown
+  moveCurrentBadge(null);
   
   // Deselect endboss button
   const btn = document.getElementById('btnEndboss');
@@ -1609,6 +1687,9 @@ function selectCleanup(value) {
   
   selectedBossType = 'cleanup';
   selectedBoss = 'cleanup';
+  
+  // Remove badge when using dropdown
+  moveCurrentBadge(null);
   
   // Deselect endboss button
   const btn = document.getElementById('btnEndboss');
