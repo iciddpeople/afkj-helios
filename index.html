@@ -1109,12 +1109,26 @@ function getCompHeroes(c, globalUsedHeroes = new Set()) {
   const heroes = [];
   const localUsedHeroes = new Set(globalUsedHeroes);
   
+  // Detect heroes that appear multiple times in this comp (like summoners/clones)
+  const heroCount = {};
+  c.heroes.forEach(h => {
+    heroCount[h.name] = (heroCount[h.name] || 0) + 1;
+  });
+  const multipleAppearanceHeroes = Object.keys(heroCount).filter(name => heroCount[name] > 1);
+  
   // Helper to get active hero for a slot
   const getSlotActiveHero = (heroSlot) => {
+    // Check if hero can appear multiple times
+    const canAppearMultipleTimes = heroSlot.name.includes('Turret') || 
+                                    heroSlot.name.includes('Clone') || 
+                                    heroSlot.name.includes('Tower') ||
+                                    multipleAppearanceHeroes.includes(heroSlot.name);
+    const usedKey = canAppearMultipleTimes ? `${heroSlot.name}@${heroSlot.tileID}` : heroSlot.name;
+    
     // Check primary
     const primaryHero = HEROES[heroSlot.name];
-    if (primaryHero && !missingHeroes.has(heroSlot.name) && !localUsedHeroes.has(heroSlot.name)) {
-      return heroSlot.name;
+    if (primaryHero && !missingHeroes.has(heroSlot.name) && !localUsedHeroes.has(usedKey)) {
+      return { name: heroSlot.name, key: usedKey };
     }
     
     // Check replacements
@@ -1124,9 +1138,15 @@ function getCompHeroes(c, globalUsedHeroes = new Set()) {
         const isOverride = typeof replacement === 'object' && replacement.heroesOverride;
         
         if (!isOverride) {
+          const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || 
+                                                     replacementName.includes('Clone') || 
+                                                     replacementName.includes('Tower') ||
+                                                     multipleAppearanceHeroes.includes(replacementName);
+          const replacementKey = replacementCanAppearMultipleTimes ? `${replacementName}@${heroSlot.tileID}` : replacementName;
+          
           const replacementHero = HEROES[replacementName];
-          if (replacementHero && !missingHeroes.has(replacementName) && !localUsedHeroes.has(replacementName)) {
-            return replacementName;
+          if (replacementHero && !missingHeroes.has(replacementName) && !localUsedHeroes.has(replacementKey)) {
+            return { name: replacementName, key: replacementKey };
           }
         }
       }
@@ -1206,8 +1226,8 @@ function getCompHeroes(c, globalUsedHeroes = new Set()) {
     
     const activeHero = getSlotActiveHero(h);
     if (activeHero) {
-      heroes.push(activeHero);
-      localUsedHeroes.add(activeHero);
+      heroes.push(activeHero.name);
+      localUsedHeroes.add(activeHero.key);
     }
   }
   
@@ -1221,12 +1241,33 @@ function compValid(c, hp, globalUsedHeroes = new Set()) {
   // Also respect globally used heroes from other teams
   const usedHeroes = new Set(globalUsedHeroes);
   
+  // Detect heroes that appear multiple times in this comp (like summoners/clones)
+  const heroCount = {};
+  c.heroes.forEach(h => {
+    heroCount[h.name] = (heroCount[h.name] || 0) + 1;
+  });
+  const multipleAppearanceHeroes = Object.keys(heroCount).filter(name => heroCount[name] > 1);
+  
+  if (multipleAppearanceHeroes.length > 0) {
+    console.log(`%c🔄 Comp ${c.id || c.name} has heroes appearing multiple times: ${multipleAppearanceHeroes.join(', ')}`, 
+      'background: #8b5cf6; color: white; font-weight: bold; padding: 3px;');
+  }
+  
   // Helper function to get the active hero for a slot (primary or replacement)
   const getSlotHero = (heroSlot) => {
+    // Check if hero can appear multiple times (Turret, Clone, Tower, or appears multiple times in comp)
+    const canAppearMultipleTimes = heroSlot.name.includes('Turret') || 
+                                    heroSlot.name.includes('Clone') || 
+                                    heroSlot.name.includes('Tower') ||
+                                    multipleAppearanceHeroes.includes(heroSlot.name);
+    
+    // For heroes that can appear multiple times, use tile-specific key
+    const usedKey = canAppearMultipleTimes ? `${heroSlot.name}@${heroSlot.tileID}` : heroSlot.name;
+    
     // Check primary
     const primaryHero = HEROES[heroSlot.name];
-    if (primaryHero && !missingHeroes.has(heroSlot.name) && !usedHeroes.has(heroSlot.name)) {
-      return heroSlot.name;
+    if (primaryHero && !missingHeroes.has(heroSlot.name) && !usedHeroes.has(usedKey)) {
+      return { name: heroSlot.name, key: usedKey };
     }
     
     // Check simple replacements
@@ -1236,9 +1277,15 @@ function compValid(c, hp, globalUsedHeroes = new Set()) {
         const isOverride = typeof replacement === 'object' && replacement.heroesOverride;
         
         if (!isOverride) {
+          const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || 
+                                                     replacementName.includes('Clone') || 
+                                                     replacementName.includes('Tower') ||
+                                                     multipleAppearanceHeroes.includes(replacementName);
+          const replacementKey = replacementCanAppearMultipleTimes ? `${replacementName}@${heroSlot.tileID}` : replacementName;
+          
           const replacementHero = HEROES[replacementName];
-          if (replacementHero && !missingHeroes.has(replacementName) && !usedHeroes.has(replacementName)) {
-            return replacementName;
+          if (replacementHero && !missingHeroes.has(replacementName) && !usedHeroes.has(replacementKey)) {
+            return { name: replacementName, key: replacementKey };
           }
         }
       }
@@ -1343,10 +1390,14 @@ function compValid(c, hp, globalUsedHeroes = new Set()) {
     
     const slotHero = getSlotHero(h);
     if (!slotHero) {
+      console.log(`%c✗ compValid FAILED for ${c.id || c.name}: No valid hero for slot ${h.tileID} (${h.name})`, 'background: #ef4444; color: white; padding: 2px 5px;');
+      console.log(`  - Hero missing: ${missingHeroes.has(h.name)}`);
+      console.log(`  - Hero already used: ${usedHeroes.has(h.name)}`);
+      console.log(`  - Current usedHeroes:`, Array.from(usedHeroes));
       return false; // No valid hero for this slot
     }
     
-    usedHeroes.add(slotHero);
+    usedHeroes.add(slotHero.key);
   }
   
   return true;
@@ -1593,6 +1644,13 @@ function recommend() {
   console.log("Enabled comps:", comps.filter(c => c.enabled !== false).length, "/ Disabled:", comps.filter(c => c.enabled === false).length);
   
   // Filter comps by selected boss and enabled status
+  console.log(`%c
+╔════════════════════════════════════════════════╗
+║         FILTER CRITERIA (SUB-TEAM DEBUG)      ║
+╚════════════════════════════════════════════════╝`, 'background: #f59e0b; color: white; font-size: 16px; font-weight: bold; padding: 10px;');
+  console.log(`%cselectedBossType: "${selectedBossType}", selectedBoss: "${selectedBoss}"`, 'font-size: 14px; color: #10b981; font-weight: bold;');
+  console.log(`%cTotal comps to filter: ${comps.length}`, 'font-size: 14px; color: #10b981; font-weight: bold;');
+  
   const allComps = comps.filter(c => {
     // Skip disabled compositions
     if (c.enabled === false) {
@@ -1601,10 +1659,18 @@ function recommend() {
     }
     
     // Check if comp matches the selected boss type and boss
-    if (c.bossType === selectedBossType && c.bossId === selectedBoss) {
-      console.log(`Including comp: ${c.id || c.name} (enabled: ${c.enabled !== false})`);
+    const bossTypeMatch = c.bossType === selectedBossType;
+    const bossIdMatch = c.bossId === selectedBoss;
+    
+    if (bossTypeMatch && bossIdMatch) {
+      const style = c.isSubTeam ? 'background: #8b5cf6; color: white; font-weight: bold; padding: 2px 6px;' : 'color: #10b981;';
+      console.log(`%c✓ Including: ${c.id || c.name} | isSubTeam: ${c.isSubTeam || false}`, style);
       return true;
+    } else {
+      const style = c.isSubTeam ? 'background: #ef4444; color: white; font-weight: bold; padding: 2px 6px;' : 'color: #64748b;';
+      console.log(`%c✗ EXCLUDING: ${c.id || c.name} | bossType: "${c.bossType}" (want: "${selectedBossType}"), bossId: "${c.bossId}" (want: "${selectedBoss}"), isSubTeam: ${c.isSubTeam || false}`, style);
     }
+    
     // Fallback for old format (conditions-based)
     if (!c.bossType && c.conditions) {
       return conditionsMet(c, 100);
@@ -1618,19 +1684,163 @@ function recommend() {
   const primaryTeams = allComps.filter(c => !c.isSubTeam);
   const subTeams = allComps.filter(c => c.isSubTeam);
   
-  console.log("Primary teams:", primaryTeams.map(c => c.id || c.name));
-  console.log("Sub-teams:", subTeams.map(c => c.id || c.name));
+  console.log(`%c██ Primary teams (${primaryTeams.length}):`, 'background: #3b82f6; color: white; font-size: 14px; font-weight: bold; padding: 5px;', primaryTeams.map(c => c.id || c.name));
+  console.log(`%c██ Sub-teams (${subTeams.length}):`, 'background: #8b5cf6; color: white; font-size: 14px; font-weight: bold; padding: 5px;', subTeams.map(c => c.id || c.name));
+  
+  // Show detailed sub-team cascade configuration
+  console.log(`%c🔗 SUB-TEAM CASCADE CONFIGURATION:`, 'background: #8b5cf6; color: white; font-size: 14px; font-weight: bold; padding: 5px;');
+  subTeams.forEach(st => {
+    console.log(`  📌 ${st.id || st.name}:`);
+    console.log(`     - compID: ${st.compID || 'N/A'}`);
+    console.log(`     - id: ${st.id || 'N/A'}`);
+    console.log(`     - subTeamId: ${st.subTeamId || 'NONE (no fallback)'}`);
+    console.log(`     - isSubTeam: ${st.isSubTeam}`);
+  });
+  
+  // Also show primary teams and their fallbacks
+  console.log(`%c🔗 PRIMARY TEAM FALLBACK CONFIGURATION:`, 'background: #3b82f6; color: white; font-size: 14px; font-weight: bold; padding: 5px;');
+  primaryTeams.forEach(pt => {
+    console.log(`  📌 ${pt.id || pt.name}:`);
+    console.log(`     - compID: ${pt.compID || 'N/A'}`);
+    console.log(`     - id: ${pt.id || 'N/A'}`);
+    console.log(`     - subTeamId: ${pt.subTeamId || 'NONE (no fallback)'}`);
+  });
+  
+  if (subTeams.length === 0) {
+    console.log(`%c⚠️ WARNING: NO SUB-TEAMS FOUND! They may have been filtered out.`, 'background: #ef4444; color: white; font-size: 14px; font-weight: bold; padding: 10px;');
+  }
+  
+  // Show missing heroes for sub-team debugging
+  console.log(`%c🚫 MISSING HEROES (${missingHeroes.size}):`, 'background: #dc2626; color: white; font-size: 14px; font-weight: bold; padding: 5px;', Array.from(missingHeroes));
+  console.log(`%c💡 For boss1_unrivaled fallback: Kulu, Aliceth, AND Mehira must ALL be in the missing list above!`, 'background: #0ea5e9; color: white; font-size: 12px; font-weight: bold; padding: 5px;');
   
   // Track heroes used globally across all recommended teams
   const globalUsedHeroes = new Set();
   const recommended = [];
+  
+  // Helper to inherit replacements from parent team to sub-team
+  const inheritReplacements = (subTeam, parentTeam) => {
+    // Create a copy of sub-team with inherited replacements
+    const enhancedSubTeam = JSON.parse(JSON.stringify(subTeam));
+    
+    // For each hero in sub-team, check if parent has replacements for it
+    enhancedSubTeam.heroes.forEach(subHero => {
+      const parentHero = parentTeam.heroes.find(ph => ph.name === subHero.name);
+      if (parentHero && parentHero.replacements && parentHero.replacements.length > 0) {
+        // Merge parent replacements with sub-team's existing replacements
+        const existingReplacements = subHero.replacements || [];
+        const inheritedReplacements = parentHero.replacements.filter(r => {
+          const repName = typeof r === 'string' ? r : r.name;
+          return !existingReplacements.some(er => {
+            const erName = typeof er === 'string' ? er : er.name;
+            return erName === repName;
+          });
+        });
+        
+        if (inheritedReplacements.length > 0) {
+          subHero.replacements = [...existingReplacements, ...inheritedReplacements];
+          console.log(`  🔄 Inherited replacements for ${subHero.name}: ${inheritedReplacements.map(r => typeof r === 'string' ? r : r.name).join(', ')}`);
+        }
+      }
+    });
+    
+    return enhancedSubTeam;
+  };
+  
+  // Helper function to recursively try sub-teams (with cascade support + replacement inheritance)
+  const trySubTeamCascade = (primaryTeam, depth = 0) => {
+    if (depth > 5) {
+      console.log(`%c⚠️ Max sub-team depth (5) reached, stopping cascade`, 'background: #ef4444; color: white; font-weight: bold; padding: 5px;');
+      return null;
+    }
+    
+    if (!primaryTeam.subTeamId) {
+      console.log(`  ${'  '.repeat(depth)}└─ Team ${primaryTeam.id || primaryTeam.name} has NO subTeamId, stopping cascade`);
+      return null;
+    }
+    
+    const indent = '  '.repeat(depth);
+    console.log(`${indent}└─ Team ${primaryTeam.id || primaryTeam.name} invalid, checking for sub-team: ${primaryTeam.subTeamId}`);
+    console.log(`${indent}   Available sub-teams in pool: ${subTeams.map(s => s.compID || s.id).join(', ')}`);
+    const subTeam = subTeams.find(s => (s.compID || s.id) === primaryTeam.subTeamId);
+    
+    if (!subTeam) {
+      console.log(`${indent}   %c✗ No sub-team found with ID ${primaryTeam.subTeamId}`, 'background: #ef4444; color: white; padding: 2px;');
+      return null;
+    }
+    
+    console.log(`${indent}   %c✓ Found sub-team: ${subTeam.id || subTeam.name}`, 'background: #8b5cf6; color: white; padding: 2px;');
+    console.log(`${indent}   Sub-team has subTeamId: ${subTeam.subTeamId || 'NONE'}`);
+    console.log(`${indent}   Sub-team is marked as isSubTeam: ${subTeam.isSubTeam}`)
+    
+    // Inherit replacements from parent team
+    const enhancedSubTeam = inheritReplacements(subTeam, primaryTeam);
+    
+    console.log(`${indent}\n========== Found sub-team (depth ${depth}): ${enhancedSubTeam.id || enhancedSubTeam.name} ==========`);
+    console.log(`${indent}Sub-team heroes:`, enhancedSubTeam.heroes.map(h => `${h.name} (tile ${h.tileID})`));
+    console.log(`${indent}Missing heroes status:`, enhancedSubTeam.heroes.map(h => {
+      const isMissing = missingHeroes.has(h.name);
+      return `${h.name}: missing=${isMissing}`;
+    }));
+    
+    const heroAvailability = enhancedSubTeam.heroes.map(h => {
+      const missing = missingHeroes.has(h.name);
+      return { name: h.name, available: !missing };
+    });
+    const unavailableHeroes = heroAvailability.filter(h => !h.available).map(h => h.name);
+    
+    if (unavailableHeroes.length > 0) {
+      console.log(`${indent}%c⚠️ Sub-team has ${unavailableHeroes.length} UNAVAILABLE heroes: ${unavailableHeroes.join(', ')}`, 'background: #ef4444; color: white; font-weight: bold; padding: 5px;');
+    } else {
+      console.log(`${indent}%c✓ All sub-team heroes are available!`, 'background: #10b981; color: white; font-weight: bold; padding: 5px;');
+    }
+    
+    const subValid = compValid(enhancedSubTeam, 100, globalUsedHeroes);
+    console.log(`${indent}Sub-team`, enhancedSubTeam.id || enhancedSubTeam.name, "compValid:", subValid);
+    
+    if (subValid) {
+      // This sub-team is valid, return it (with inherited replacements)
+      console.log(`${indent}✓ Sub-team is valid!`);
+      return enhancedSubTeam;
+    } else {
+      // This sub-team also failed, try its sub-team (cascade with inheritance)
+      console.log(`${indent}✗ Sub-team also invalid, checking for cascaded sub-team...`);
+      return trySubTeamCascade(enhancedSubTeam, depth + 1);
+    }
+  };
   
   // Iteratively select valid teams while tracking global hero usage
   // Try primary teams first, then their sub-teams if primary fails
   for (const c of primaryTeams) {
     if (recommended.length >= 3) break;
     
-    console.log(`\nChecking primary team ${c.id} with globalUsedHeroes:`, Array.from(globalUsedHeroes));
+    console.log(`\n========== Checking primary team: ${c.id || c.name} ==========`);
+    console.log(`GlobalUsedHeroes:`, Array.from(globalUsedHeroes));
+    console.log(`Team heroes:`, c.heroes.map(h => {
+      const reps = h.replacements || [];
+      return `${h.name} (tile ${h.tileID})` + (reps.length ? ` [reps: ${reps.join(', ')}]` : '');
+    }));
+    console.log(`Missing heroes status:`, c.heroes.map(h => {
+      const primaryMissing = missingHeroes.has(h.name);
+      const reps = (h.replacements || []).map(r => ({name: r, missing: missingHeroes.has(r)}));
+      return `${h.name}: missing=${primaryMissing}, reps=${JSON.stringify(reps)}`;
+    }));
+    
+    // Special check for Kulu slot
+    const kuluSlot = c.heroes.find(h => h.name === 'Kulu');
+    if (kuluSlot) {
+      const kuluMissing = missingHeroes.has('Kulu');
+      const alicethMissing = missingHeroes.has('Aliceth');
+      const mehiraMissing = missingHeroes.has('Mehira');
+      console.log(`%c🔍 KULU SLOT CHECK: Kulu missing=${kuluMissing}, Aliceth missing=${alicethMissing}, Mehira missing=${mehiraMissing}`, 
+        'background: #fbbf24; color: black; font-weight: bold; padding: 5px;');
+      if (kuluMissing && alicethMissing && mehiraMissing) {
+        console.log(`%c✓ ALL THREE HEROES MISSING - Primary team SHOULD FAIL and trigger sub-team!`, 'background: #10b981; color: white; font-weight: bold; padding: 5px;');
+      } else {
+        console.log(`%c✗ At least one hero available - Primary team WILL BE VALID (no fallback)`, 'background: #ef4444; color: white; font-weight: bold; padding: 5px;');
+      }
+    }
+    
     const valid = compValid(c, 100, globalUsedHeroes);
     console.log("Primary team", c.id, "compValid:", valid);
     
@@ -1642,32 +1852,23 @@ function recommend() {
       compHeroes.forEach(h => globalUsedHeroes.add(h));
       recommended.push(c);
       console.log(`Added primary ${c.id} to recommended. GlobalUsedHeroes now:`, Array.from(globalUsedHeroes));
-    } else if (c.subTeamId) {
-      // Primary team invalid, try its sub-team
-      console.log(`Primary team ${c.id} invalid, checking for sub-team: ${c.subTeamId}`);
-      const subTeam = subTeams.find(s => (s.compID || s.id) === c.subTeamId);
+    } else {
+      // Primary team invalid, try its sub-team (with cascade support)
+      const validSubTeam = trySubTeamCascade(c, 0);
       
-      if (subTeam) {
-        console.log(`Found sub-team ${subTeam.id || subTeam.name}, checking validity...`);
-        const subValid = compValid(subTeam, 100, globalUsedHeroes);
-        console.log("Sub-team", subTeam.id, "compValid:", subValid);
+      if (validSubTeam) {
+        // Track which heroes this sub-team will use
+        const subCompHeroes = getCompHeroes(validSubTeam, globalUsedHeroes);
+        console.log(`Sub-team ${validSubTeam.id || validSubTeam.name} will use heroes:`, subCompHeroes);
         
-        if (subValid) {
-          // Track which heroes this sub-team will use
-          const subCompHeroes = getCompHeroes(subTeam, globalUsedHeroes);
-          console.log(`Sub-team ${subTeam.id} will use heroes:`, subCompHeroes);
-          
-          subCompHeroes.forEach(h => globalUsedHeroes.add(h));
-          // Mark that this is being used as a fallback
-          subTeam.isFallbackActive = true;
-          subTeam.fallbackFor = c.name || c.id;
-          recommended.push(subTeam);
-          console.log(`Added sub-team ${subTeam.id} to recommended as fallback. GlobalUsedHeroes now:`, Array.from(globalUsedHeroes));
-        } else {
-          console.log(`Sub-team ${subTeam.id} also invalid, skipping this slot`);
-        }
+        subCompHeroes.forEach(h => globalUsedHeroes.add(h));
+        // Mark that this is being used as a fallback
+        validSubTeam.isFallbackActive = true;
+        validSubTeam.fallbackFor = c.name || c.id;
+        recommended.push(validSubTeam);
+        console.log(`Added sub-team ${validSubTeam.id || validSubTeam.name} to recommended as fallback. GlobalUsedHeroes now:`, Array.from(globalUsedHeroes));
       } else {
-        console.log(`No sub-team found with ID ${c.subTeamId}`);
+        console.log(`No valid sub-team found for ${c.id || c.name}, skipping this slot`);
       }
     }
   }
@@ -1689,12 +1890,16 @@ function recommend() {
 /* ==========================
    RESULT
 ========================== */
-function getActiveHero(heroSlot, usedHeroes = new Set(), globalUsedHeroes = new Set()) {
+function getActiveHero(heroSlot, usedHeroes = new Set(), globalUsedHeroes = new Set(), multipleAppearanceHeroes = []) {
   // Try to use the primary hero
   const primaryHero = HEROES[heroSlot.name];
-  // Special case: Allow turrets and clones to appear multiple times in the same formation
-  const canAppearMultipleTimes = heroSlot.name.includes('Turret') || heroSlot.name.includes('Clone') || heroSlot.name.includes('Tower');
-  const isUsedInThisComp = !canAppearMultipleTimes && usedHeroes.has(heroSlot.name);
+  // Special case: Allow turrets, clones, and heroes appearing multiple times
+  const canAppearMultipleTimes = heroSlot.name.includes('Turret') || 
+                                  heroSlot.name.includes('Clone') || 
+                                  heroSlot.name.includes('Tower') ||
+                                  multipleAppearanceHeroes.includes(heroSlot.name);
+  const usedKey = canAppearMultipleTimes ? `${heroSlot.name}@${heroSlot.tileID}` : heroSlot.name;
+  const isUsedInThisComp = usedHeroes.has(usedKey);
   
   console.log(`[getActiveHero] Checking ${heroSlot.name}:`, {
     exists: !!primaryHero,
@@ -1717,8 +1922,12 @@ function getActiveHero(heroSlot, usedHeroes = new Set(), globalUsedHeroes = new 
       // Support both string format and object format
       const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
       const replacementTileID = typeof replacement === 'object' && replacement.tileID ? replacement.tileID : heroSlot.tileID;
-      const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || replacementName.includes('Clone') || replacementName.includes('Tower');
-      const replacementIsUsedInThisComp = !replacementCanAppearMultipleTimes && usedHeroes.has(replacementName);
+      const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || 
+                                                 replacementName.includes('Clone') || 
+                                                 replacementName.includes('Tower') ||
+                                                 multipleAppearanceHeroes.includes(replacementName);
+      const replacementUsedKey = replacementCanAppearMultipleTimes ? `${replacementName}@${replacementTileID}` : replacementName;
+      const replacementIsUsedInThisComp = usedHeroes.has(replacementUsedKey);
       
       const replacementHero = HEROES[replacementName];
       console.log(`[getActiveHero] Checking replacement ${replacementName}:`, {
@@ -1879,8 +2088,21 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
   
   console.log(`Drawing heroes from heroesToDraw (${heroesToDraw.length} heroes):`, heroesToDraw.map(h => h.name));
   
+  // Detect heroes that appear multiple times in this formation (like summoners/clones)
+  const heroCountInFormation = {};
+  heroesToDraw.forEach(h => {
+    heroCountInFormation[h.name] = (heroCountInFormation[h.name] || 0) + 1;
+  });
+  const multipleAppearanceHeroesInFormation = Object.keys(heroCountInFormation).filter(name => heroCountInFormation[name] > 1);
+  
+  if (multipleAppearanceHeroesInFormation.length > 0) {
+    console.log(`%c🔄 Formation has heroes appearing multiple times: ${multipleAppearanceHeroesInFormation.join(', ')}`, 
+      'background: #8b5cf6; color: white; font-weight: bold; padding: 3px;');
+  }
+  
   // Track which heroes are used to prevent drawing duplicates
   // Start with globally used heroes from other teams
+  // For heroes that can appear multiple times, use tile-specific keys
   const usedHeroes = new Set(globalUsedHeroes);
   
   // Load and draw each hero icon at their tile position
@@ -1891,7 +2113,7 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
     if (heroSlot.linkedTo) {
       const linkedHero = heroesToDraw.find(h => h.name === heroSlot.linkedTo);
       if (linkedHero) {
-        const linkedActiveHero = getActiveHero(linkedHero, usedHeroes, globalUsedHeroes);
+        const linkedActiveHero = getActiveHero(linkedHero, usedHeroes, globalUsedHeroes, multipleAppearanceHeroesInFormation);
         // Only draw this hero if the linked hero is present and not replaced
         if (!linkedActiveHero || linkedActiveHero.name !== linkedHero.name) {
           console.log(`Skipping ${heroSlot.name} at tile ${heroSlot.tileID} because linked hero ${heroSlot.linkedTo} is missing or replaced`);
@@ -1906,9 +2128,13 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
     if (useOverride) {
       // Check if hero from override needs replacement
       const hero = HEROES[heroSlot.name];
-      // Special case: Allow turrets and clones to appear multiple times in the same formation
-      const canAppearMultipleTimes = heroSlot.name.includes('Turret') || heroSlot.name.includes('Clone') || heroSlot.name.includes('Tower');
-      const isAlreadyUsedInThisComp = !canAppearMultipleTimes && usedHeroes.has(heroSlot.name);
+      // Special case: Allow turrets, clones, and heroes that appear multiple times in the formation
+      const canAppearMultipleTimes = heroSlot.name.includes('Turret') || 
+                                      heroSlot.name.includes('Clone') || 
+                                      heroSlot.name.includes('Tower') ||
+                                      multipleAppearanceHeroesInFormation.includes(heroSlot.name);
+      const usedKey = canAppearMultipleTimes ? `${heroSlot.name}@${heroSlot.tileID}` : heroSlot.name;
+      const isAlreadyUsedInThisComp = usedHeroes.has(usedKey);
       
       if (hero && !missingHeroes.has(heroSlot.name) && !isAlreadyUsedInThisComp && !globalUsedHeroes.has(heroSlot.name)) {
         // Hero is directly available and not used
@@ -1924,8 +2150,12 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
             
             if (!isNestedOverride) {
               const replacementHero = HEROES[replacementName];
-              const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || replacementName.includes('Clone') || replacementName.includes('Tower');
-              const replacementIsUsedInThisComp = !replacementCanAppearMultipleTimes && usedHeroes.has(replacementName);
+              const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || 
+                                                         replacementName.includes('Clone') || 
+                                                         replacementName.includes('Tower') ||
+                                                         multipleAppearanceHeroesInFormation.includes(replacementName);
+              const replacementUsedKey = replacementCanAppearMultipleTimes ? `${replacementName}@${heroSlot.tileID}` : replacementName;
+              const replacementIsUsedInThisComp = usedHeroes.has(replacementUsedKey);
               
               if (replacementHero && !missingHeroes.has(replacementName) && !replacementIsUsedInThisComp && !globalUsedHeroes.has(replacementName)) {
                 console.log(`Using replacement ${replacementName} for override hero ${heroSlot.name}`);
@@ -1945,8 +2175,12 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
             for (const replacement of originalHero.replacements) {
               const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
               const isNestedOverride = typeof replacement === 'object' && replacement.heroesOverride;
-              const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || replacementName.includes('Clone') || replacementName.includes('Tower');
-              const replacementIsUsedInThisComp = !replacementCanAppearMultipleTimes && usedHeroes.has(replacementName);
+              const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || 
+                                                         replacementName.includes('Clone') || 
+                                                         replacementName.includes('Tower') ||
+                                                         multipleAppearanceHeroesInFormation.includes(replacementName);
+              const replacementUsedKey = replacementCanAppearMultipleTimes ? `${replacementName}@${heroSlot.tileID}` : replacementName;
+              const replacementIsUsedInThisComp = usedHeroes.has(replacementUsedKey);
             
               if (!isNestedOverride) {
                 const replacementHero = HEROES[replacementName];
@@ -1968,15 +2202,37 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
     } else {
       // Normal logic with replacements
       console.log(`Calling getActiveHero for ${heroSlot.name}...`);
-      activeHero = getActiveHero(heroSlot, usedHeroes, globalUsedHeroes);
+      activeHero = getActiveHero(heroSlot, usedHeroes, globalUsedHeroes, multipleAppearanceHeroesInFormation);
       console.log(`getActiveHero returned:`, activeHero);
     }
     
     console.log(`Hero slot tileID ${heroSlot.tileID}: ${heroSlot.name} -> active:`, activeHero);
     
     if (activeHero) {
-      // Mark hero as used - for turrets/clones, track by name+tileID to allow multiple in same formation
-      const canAppearMultipleTimes = activeHero.name.includes('Turret') || activeHero.name.includes('Clone') || activeHero.name.includes('Tower');
+      // For heroes appearing multiple times, check if we should use clone icon BEFORE marking as used
+      const appearsMultipleTimes = multipleAppearanceHeroesInFormation.includes(activeHero.name);
+      let displayName = activeHero.name;
+      
+      if (appearsMultipleTimes) {
+        // Count how many times we've already used this hero (before adding current)
+        const timesUsed = Array.from(usedHeroes).filter(key => key.startsWith(activeHero.name + '@')).length;
+        console.log(`Hero ${activeHero.name} appears multiple times in formation. Times already used: ${timesUsed}`);
+        
+        // For 2nd+ occurrence, try to use clone variant
+        if (timesUsed >= 1) {
+          const cloneKey = `${activeHero.name}_Clone`;
+          if (HEROES[cloneKey]) {
+            displayName = HEROES[cloneKey].name;
+            console.log(`✓ Using clone variant for ${activeHero.name}: ${displayName}`);
+          }
+        }
+      }
+      
+      // Mark hero as used - for turrets/clones and heroes appearing multiple times, track by name+tileID
+      const canAppearMultipleTimes = activeHero.name.includes('Turret') || 
+                                      activeHero.name.includes('Clone') || 
+                                      activeHero.name.includes('Tower') ||
+                                      appearsMultipleTimes;
       const usedKey = canAppearMultipleTimes ? `${activeHero.name}@${activeHero.tileID}` : activeHero.name;
       usedHeroes.add(usedKey);
       console.log(`Marked ${activeHero.name} as used (key: ${usedKey}). UsedHeroes:`, Array.from(usedHeroes));
@@ -1987,10 +2243,10 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
       
       console.log(`Active hero ${activeHero.name} - tileID: ${tileID}, tilePos:`, tilePos);
       
-      // Always lookup icon from the active hero (whether primary or replacement)
-      const hero = HEROES[activeHero.name];
+      // Always lookup icon from the display name (regular or clone variant)
+      const hero = displayName === activeHero.name ? HEROES[activeHero.name] : HEROES[displayName.replace(' ', '_')];
       const iconPath = hero ? hero.icon : null;
-      console.log(`Looking up icon for ${activeHero.name}:`, iconPath);
+      console.log(`Looking up icon for ${displayName}:`, iconPath);
       
       if (tilePos && iconPath) {
         console.log(`✓ Drawing ${activeHero.name} at tile ${tileID}:`, tilePos);
@@ -2187,48 +2443,157 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
       const hallPrimary = hallTeams.filter(c => !c.isSubTeam);
       const hallSubs = hallTeams.filter(c => c.isSubTeam);
       
+      // Log buff-separated configuration
+      console.log(`%c🔥 UNRIVALED MIGHT CONFIGURATION:`, 'background: #dc2626; color: white; font-size: 14px; font-weight: bold; padding: 5px;');
+      console.log(`  Primary teams: ${unrivaledPrimary.map(c => c.id || c.name).join(', ')}`);
+      console.log(`  Sub-teams: ${unrivaledSubs.map(c => c.id || c.name).join(', ')}`);
+      unrivaledSubs.forEach(st => {
+        console.log(`    📌 ${st.id || st.name} → fallback: ${st.subTeamId || 'NONE'}`);
+      });
+      
+      console.log(`%c🏛️ HALL OF LEGENDS CONFIGURATION:`, 'background: #7c3aed; color: white; font-size: 14px; font-weight: bold; padding: 5px;');
+      console.log(`  Primary teams: ${hallPrimary.map(c => c.id || c.name).join(', ')}`);
+      console.log(`  Sub-teams: ${hallSubs.map(c => c.id || c.name).join(', ')}`);
+      hallSubs.forEach(st => {
+        console.log(`    📌 ${st.id || st.name} → fallback: ${st.subTeamId || 'NONE'}`);
+      });
+      
       // Find recommended teams for each buff
       const unrivaledRecommended = [];
       const hallRecommended = [];
       const unrivaledUsedHeroes = new Set();
       const hallUsedHeroes = new Set();
       
-      // Process Unrivaled Might teams (primary + sub fallback)
+      // Helper to inherit replacements (same as main cascade)
+      const inheritBuffReplacements = (subTeam, parentTeam) => {
+        const enhancedSubTeam = JSON.parse(JSON.stringify(subTeam));
+        
+        enhancedSubTeam.heroes.forEach(subHero => {
+          const parentHero = parentTeam.heroes.find(ph => ph.name === subHero.name);
+          if (parentHero && parentHero.replacements && parentHero.replacements.length > 0) {
+            const existingReplacements = subHero.replacements || [];
+            const inheritedReplacements = parentHero.replacements.filter(r => {
+              const repName = typeof r === 'string' ? r : r.name;
+              return !existingReplacements.some(er => {
+                const erName = typeof er === 'string' ? er : er.name;
+                return erName === repName;
+              });
+            });
+            
+            if (inheritedReplacements.length > 0) {
+              subHero.replacements = [...existingReplacements, ...inheritedReplacements];
+              console.log(`  [BUFF] 🔄 Inherited replacements for ${subHero.name}: ${inheritedReplacements.map(r => typeof r === 'string' ? r : r.name).join(', ')}`);
+            }
+          }
+        });
+        
+        return enhancedSubTeam;
+      };
+      
+      // Helper for cascading sub-teams in buff context (with replacement inheritance)
+      const tryBuffSubTeamCascade = (primaryTeam, subTeamsList, usedHeroes, depth = 0) => {
+        if (depth > 5) {
+          console.log(`%c⚠️ [BUFF] Max sub-team depth (5) reached, stopping cascade`, 'background: #ef4444; color: white; font-weight: bold; padding: 5px;');
+          return null;
+        }
+        
+        if (!primaryTeam.subTeamId) {
+          console.log(`  ${'  '.repeat(depth)}└─ [BUFF] Team ${primaryTeam.id || primaryTeam.name} has NO subTeamId, stopping cascade`);
+          return null;
+        }
+        
+        const indent = '  '.repeat(depth);
+        console.log(`${indent}└─ [BUFF] Team ${primaryTeam.id || primaryTeam.name} invalid, checking for sub-team: ${primaryTeam.subTeamId}`);
+        console.log(`${indent}   [BUFF] Available sub-teams in pool: ${subTeamsList.map(s => s.compID || s.id).join(', ')}`);
+        const subTeam = subTeamsList.find(s => (s.compID || s.id) === primaryTeam.subTeamId);
+        
+        if (!subTeam) {
+          console.log(`${indent}   %c✗ [BUFF] No sub-team found with ID ${primaryTeam.subTeamId}`, 'background: #ef4444; color: white; padding: 2px;');
+          return null;
+        }
+        
+        console.log(`${indent}   %c✓ [BUFF] Found sub-team: ${subTeam.id || subTeam.name}`, 'background: #8b5cf6; color: white; padding: 2px;');
+        console.log(`${indent}   [BUFF] Sub-team has subTeamId: ${subTeam.subTeamId || 'NONE'}`);
+        
+        // Inherit replacements from parent team
+        const enhancedSubTeam = inheritBuffReplacements(subTeam, primaryTeam);
+        
+        console.log(`${indent}   [BUFF] Sub-team heroes:`, enhancedSubTeam.heroes.map(h => h.name).join(', '));
+        console.log(`${indent}   [BUFF] Missing heroes in sub-team:`, enhancedSubTeam.heroes.filter(h => missingHeroes.has(h.name)).map(h => h.name).join(', ') || 'NONE');
+        console.log(`${indent}   [BUFF] Checking if sub-team is valid...`);
+        
+        if (compValid(enhancedSubTeam, 100, usedHeroes)) {
+          console.log(`${indent}   %c✓ [BUFF] Sub-team is VALID!`, 'background: #10b981; color: white; padding: 2px;');
+          return enhancedSubTeam;
+        } else {
+          // This sub-team also failed, try its sub-team (cascade with inheritance)
+          console.log(`${indent}   %c✗ [BUFF] Sub-team INVALID, checking for cascaded sub-team...`, 'background: #f59e0b; color: white; padding: 2px;');
+          return tryBuffSubTeamCascade(enhancedSubTeam, subTeamsList, usedHeroes, depth + 1);
+        }
+      };
+      
+      // Process Unrivaled Might teams (primary + cascading sub fallback)
       for (const c of unrivaledPrimary) {
         if (unrivaledRecommended.length >= 3) break;
-        if (compValid(c, 100, unrivaledUsedHeroes)) {
+        console.log(`\n%c[BUFF-UNRIVALED] Processing team: ${c.id || c.name}`, 'background: #dc2626; color: white; font-weight: bold; padding: 3px;');
+        console.log(`[BUFF-UNRIVALED] Has subTeamId: ${c.subTeamId || 'NONE'}`);
+        
+        const isValid = compValid(c, 100, unrivaledUsedHeroes);
+        console.log(`[BUFF-UNRIVALED] Team valid: ${isValid}`);
+        
+        if (isValid) {
+          console.log(`[BUFF-UNRIVALED] ✓ Adding primary team to recommendations`);
           const compHeroes = getCompHeroes(c, unrivaledUsedHeroes);
           compHeroes.forEach(h => unrivaledUsedHeroes.add(h));
           unrivaledRecommended.push(c);
-        } else if (c.subTeamId) {
-          // Try sub-team
-          const subTeam = unrivaledSubs.find(s => (s.compID || s.id) === c.subTeamId);
-          if (subTeam && compValid(subTeam, 100, unrivaledUsedHeroes)) {
-            const subCompHeroes = getCompHeroes(subTeam, unrivaledUsedHeroes);
+        } else {
+          // Try cascading sub-teams
+          console.log(`[BUFF-UNRIVALED] ✗ Primary invalid, trying cascade...`);
+          const validSubTeam = tryBuffSubTeamCascade(c, unrivaledSubs, unrivaledUsedHeroes);
+          console.log(`[BUFF-UNRIVALED] Cascade returned:`, validSubTeam ? (validSubTeam.id || validSubTeam.name) : 'NULL');
+          
+          if (validSubTeam) {
+            console.log(`[BUFF-UNRIVALED] ✓ Adding sub-team to recommendations`);
+            const subCompHeroes = getCompHeroes(validSubTeam, unrivaledUsedHeroes);
             subCompHeroes.forEach(h => unrivaledUsedHeroes.add(h));
-            subTeam.isFallbackActive = true;
-            subTeam.fallbackFor = c.name || c.id;
-            unrivaledRecommended.push(subTeam);
+            validSubTeam.isFallbackActive = true;
+            validSubTeam.fallbackFor = c.name || c.id;
+            unrivaledRecommended.push(validSubTeam);
+          } else {
+            console.log(`[BUFF-UNRIVALED] ✗ No valid sub-team found, skipping slot`);
           }
         }
       }
       
-      // Process Hall of Legends teams (primary + sub fallback)
+      // Process Hall of Legends teams (primary + cascading sub fallback)
       for (const c of hallPrimary) {
         if (hallRecommended.length >= 3) break;
-        if (compValid(c, 100, hallUsedHeroes)) {
+        console.log(`\n%c[BUFF-HALL] Processing team: ${c.id || c.name}`, 'background: #7c3aed; color: white; font-weight: bold; padding: 3px;');
+        console.log(`[BUFF-HALL] Has subTeamId: ${c.subTeamId || 'NONE'}`);
+        
+        const isValid = compValid(c, 100, hallUsedHeroes);
+        console.log(`[BUFF-HALL] Team valid: ${isValid}`);
+        
+        if (isValid) {
+          console.log(`[BUFF-HALL] ✓ Adding primary team to recommendations`);
           const compHeroes = getCompHeroes(c, hallUsedHeroes);
           compHeroes.forEach(h => hallUsedHeroes.add(h));
           hallRecommended.push(c);
-        } else if (c.subTeamId) {
-          // Try sub-team
-          const subTeam = hallSubs.find(s => (s.compID || s.id) === c.subTeamId);
-          if (subTeam && compValid(subTeam, 100, hallUsedHeroes)) {
-            const subCompHeroes = getCompHeroes(subTeam, hallUsedHeroes);
+        } else {
+          // Try cascading sub-teams
+          console.log(`[BUFF-HALL] ✗ Primary invalid, trying cascade...`);
+          const validSubTeam = tryBuffSubTeamCascade(c, hallSubs, hallUsedHeroes);
+          console.log(`[BUFF-HALL] Cascade returned:`, validSubTeam ? (validSubTeam.id || validSubTeam.name) : 'NULL');
+          
+          if (validSubTeam) {
+            console.log(`[BUFF-HALL] ✓ Adding sub-team to recommendations`);
+            const subCompHeroes = getCompHeroes(validSubTeam, hallUsedHeroes);
             subCompHeroes.forEach(h => hallUsedHeroes.add(h));
-            subTeam.isFallbackActive = true;
-            subTeam.fallbackFor = c.name || c.id;
-            hallRecommended.push(subTeam);
+            validSubTeam.isFallbackActive = true;
+            validSubTeam.fallbackFor = c.name || c.id;
+            hallRecommended.push(validSubTeam);
+          } else {
+            console.log(`[BUFF-HALL] ✗ No valid sub-team found, skipping slot`);
           }
         }
       }
@@ -2406,23 +2771,6 @@ async function renderTeams(teams, container, showExportBtn = false) {
     teamHeader.style.fontSize = "14px";
     teamHeader.style.fontWeight = "bold";
     d.appendChild(teamHeader);
-    
-    // Add fallback indicator if this is a sub-team being used
-    if (c.isFallbackActive) {
-      const fallbackBadge = document.createElement("div");
-      fallbackBadge.style.display = "inline-block";
-      fallbackBadge.style.padding = "4px 12px";
-      fallbackBadge.style.background = "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)";
-      fallbackBadge.style.borderRadius = "6px";
-      fallbackBadge.style.color = "white";
-      fallbackBadge.style.fontSize = "11px";
-      fallbackBadge.style.fontWeight = "bold";
-      fallbackBadge.style.marginBottom = "8px";
-      fallbackBadge.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
-      fallbackBadge.textContent = `⚠️ Fallback Team (for: ${c.fallbackFor})`;
-      fallbackBadge.title = "This team is shown because the primary team couldn't be formed";
-      d.appendChild(fallbackBadge);
-    }
     
     // Generate dynamic comp image using template + hero icons
     const compImageUrl = await generateCompImage(c, renderUsedHeroes);
