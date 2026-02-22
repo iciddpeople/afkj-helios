@@ -649,8 +649,8 @@ async function loadBattleMaps() {
     console.log('Loaded battle maps:', battleMaps);
   } catch (e) {
     console.warn('Could not load maps.json, using default', e);
-    battleMaps = [{ id: 'desolate-grounds', name: 'Desolate Grounds', isCurrent: true }];
-    selectedMap = 'desolate-grounds';
+    battleMaps = [{ id: 'verdshroom', name: 'Verdshroom', isCurrent: true }];
+    selectedMap = 'verdshroom';
     currentBossPositions = [];
   }
 }
@@ -926,7 +926,7 @@ const FACTIONS = [
 
 let comps = [];
 let battleMaps = [];
-let selectedMap = 'desolate-grounds';
+let selectedMap = 'verdshroom';
 let currentBossPositions = [];
 let currentMinibosses = [];
 const missingHeroes = new Set();
