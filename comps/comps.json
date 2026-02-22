@@ -1,0 +1,112 @@
+{
+  "teams": [
+    {
+      "_comment": "Above 50% HP teams",
+      "id": "above50_team1",
+      "name": "Team 1",
+      "hint": "Best Team",
+      "compID": "TESTcompID",
+      "heroes": [
+        { "name": "Shemira", "tileID": 7 },
+        { "name": "Elijah", "tileID": 1 },
+        { "name": "Lailah", "tileID": 10 },
+        { "name": "Nazrik", "tileID": 5 },
+        { "name": "Aliceth", "tileID": 6, "replacements": [
+          "Saida",
+          {
+            "name": "Phraesto",
+            "heroesOverride": [
+              { "name": "Shemira", "tileID": 7 },
+              { "name": "Elijah", "tileID": 1 },
+              { "name": "Lailah", "tileID": 10 },
+              { "name": "Nazrik", "tileID": 5 },
+              { "name": "Phraesto", "tileID": 12 },
+              { "name": "Phraesto_Clone", "tileID": 8 },
+              { "name": "Kulu", "tileID": 3 }
+            ]
+          }
+        ] },
+        { "name": "Kulu", "tileID": 3, "replacements": ["Aurora"] }
+      ],
+      "artifact": { "name": "Bladechaser", "tileID": 14 },
+      "phantimal": { "name": "Skyclops", "tileID": 2 },
+      "conditions": { "bossHpAbove": 50 }
+    },
+    {
+      "id": "above50_team2",
+      "name": "Team 2",
+      "hint": "Better when Boss HP < 50%",
+      "compID": "TESTcompID",
+      "heroes": [
+        { 
+          "name": "Athalia", 
+          "tileID": 7, 
+          "replacements": [
+            "Saida",
+            {
+              "name": "Phraesto",
+              "heroesOverride": [
+                { "name": "Kordan", "tileID": 13 },
+                { "name": "Phraesto", "tileID": 9 },
+                { "name": "Phraesto_Clone", "tileID": 8 },
+                { "name": "Baelran", "tileID": 3, "replacements": ["Saida", "Athalia"] },
+                { "name": "Reinier", "tileID": 2 },
+                { "name": "Shadewing", "tileID": 4 }
+              ]
+            },
+            {
+              "name": "Reinier",
+              "heroesOverride": [
+                { "name": "Kordan", "tileID": 13 },
+                { "name": "Shakir", "tileID": 12 },
+                { "name": "Reinier", "tileID": 9 },
+                { "name": "Mikola", "tileID": 11 },
+                { "name": "Shadewing", "tileID": 4, "replacements": ["Marcille", "Odie"] }
+              ],
+              "phantimalOverride": { "name": "Alpha Bear", "tileID": 7 }
+            }
+          ]
+        },
+        { "name": "Kordan", "tileID": 13 },
+        { "name": "Reinier", "tileID": 9 },
+        { "name": "Baelran", "tileID": 11, "replacements": ["Saida"] },
+        { "name": "Shadewing", "tileID": 4, "replacements": ["Marcille", "Odie"] }
+      ],
+      "artifact": { "name": "Starshower", "tileID": 14 },
+      "phantimal": { "name": "Skyclops", "tileID": 5 },
+      "conditions": { "bossHpAbove": 50 }
+    },
+    {
+      "id": "above50_team3",
+      "name": "Team 3",
+      "hint": "Better when Boss HP > 50%",
+      "compID": "TESTcompID",
+      "heroes": [
+        { "name": "Sinbad", "tileID": 12 },
+        { "name": "Cassadee", "tileID": 7 },
+        { 
+          "name": "Silven", 
+          "tileID": 4,
+          "replacements": [
+            {
+              "name": "Lenya",
+              "heroesOverride": [
+                { "name": "Lenya", "tileID": 12 },
+                { "name": "Faramor", "tileID": 7 },
+                { "name": "Sinbad", "tileID": 4 },
+                { "name": "Ravion", "tileID": 13 },
+                { "name": "Valka", "tileID": 9 }
+              ],
+              "phantimalOverride": { "name": "Bloom Mother", "tileID": 11 }
+            }
+          ]
+        },
+        { "name": "Ravion", "tileID": 11 },
+        { "name": "Faramor", "tileID": 6 }
+      ],
+      "artifact": { "name": "Starshower", "tileID": 14 },
+      "phantimal": { "name": "Sigmund", "tileID": 13 },
+      "conditions": { "bossHpAbove": 50 }
+    }
+  ]
+}

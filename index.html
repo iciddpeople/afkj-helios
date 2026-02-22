@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>AFK Journey – Team Optimizer</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 { color: #38bdf8; }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  gap: 20px;
+}
+
+.top-section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+}
+
+.left-panel {
+  flex: 0 0 460px;
+  max-width: 480px;
+  min-width: 300px;
+  border-right: 1px solid #334155;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.right-panel {
+  flex: 1 1 0;
+  padding-left: 24px;
+  box-sizing: border-box;
+}
+
+.recommendations-panel {
+  width: 100%;
+  border-top: 1px solid #334155;
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 220px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 180px;
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+button {
+  background: #38bdf8;
+  border: none;
+  padding: 12px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 10px;
+  width: 100%;
+  font-size: 16px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+button:hover { background: #0ea5e9; }
+button:active { background: #0284c7; }
+
+.icon-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: nowrap;
+}
+
+.icon-row img {
+  width: 56px;
+  height: 56px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.icon-row img.active { opacity: 1; }
+.icon-row img:active { transform: scale(0.95); }
+
+.hero-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.hero-grid img {
+  width: 64px;
+  height: 64px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: opacity 0.2s, transform 0.1s;
+  object-fit: cover;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.hero-grid img.missing { opacity: 0.3; }
+.hero-grid img:active { transform: scale(0.95); }
+
+.team {
+  margin-bottom: 0;
+  padding: 0;
+  border-radius: 8px;
+  text-align: center;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team img {
+  max-width: 180px;
+  max-height: 180px;
+  margin-bottom: 15px;
+}
+
+.error { color: #f87171; }
+
+#result {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  width: 100%;
+  padding-top: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 1024px) {
+  .container {
+    padding: 10px;
+    gap: 10px;
+  }
+  .top-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .left-panel {
+    border-right: none;
+    border-bottom: 1px solid #334155;
+    padding-right: 0;
+    padding-bottom: 10px;
+    max-width: 100%;
+    min-width: 100%;
+    flex: 1 1 auto;
+  }
+  .right-panel {
+    padding-left: 0;
+    padding-top: 10px;
+  }
+  .recommendations-panel {
+    padding-top: 10px;
+    min-height: 180px;
+  }
+  .hero-grid {
+    gap: 6px;
+  }
+  .hero-grid img {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* Mobile - Portrait */
+@media (max-width: 768px) {
+  .container {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  h2 {
+    font-size: 1.3em;
+    margin: 10px 0;
+  }
+  
+  h3 {
+    font-size: 1.1em;
+    margin: 8px 0;
+  }
+  
+  .hero-grid {
+    gap: 6px;
+  }
+  
+  .hero-grid img {
+    width: 52px;
+    height: 52px;
+  }
+  
+  .icon-row {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  .icon-row img {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .team img {
+    max-width: 200px;
+    max-height: 200px;
+  }
+  
+  #result {
+    gap: 12px;
+    padding-top: 12px;
+  }
+  
+  select {
+    font-size: 16px !important;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  
+  textarea {
+    font-size: 16px;
+    min-height: 150px;
+  }
+  
+  #battleMapContainer img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Mobile - Small Phones */
+@media (max-width: 480px) {
+  .container {
+    padding: 6px;
+    gap: 6px;
+  }
+  
+  h2 {
+    font-size: 1.2em;
+  }
+  
+  .hero-grid img {
+    width: 46px;
+    height: 46px;
+  }
+  
+  .icon-row img {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .team img {
+    max-width: 180px;
+    max-height: 180px;
+  }
+}
+
+/* Landscape Mode - Mobile Devices */
+@media (max-width: 900px) and (orientation: landscape) {
+  .container {
+    padding: 8px;
+  }
+  
+  .top-section {
+    flex-direction: row;
+  }
+  
+  .left-panel {
+    flex: 0 0 320px;
+    min-width: 280px;
+    max-width: 380px;
+    border-right: 1px solid #334155;
+    border-bottom: none;
+    padding-right: 8px;
+    padding-bottom: 0;
+  }
+  
+  .right-panel {
+    padding-left: 12px;
+    padding-top: 0;
+  }
+  
+  .hero-grid {
+    gap: 4px;
+  }
+  
+  .hero-grid img {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .icon-row {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  
+  .icon-row img {
+    width: 38px;
+    height: 38px;
+  }
+  
+  h2 {
+    font-size: 1.1em;
+    margin: 8px 0;
+  }
+  
+  .team img {
+    max-width: 140px;
+    max-height: 140px;
+  }
+  
+  #result {
+    gap: 8px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="header-container" style="position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; gap: 24px; margin-bottom: 20px; padding: 12px 20px 12px 20px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing: border-box;">
+  <div style="flex: 0 0 460px; max-width: 480px; min-width: 300px; display: flex; align-items: center; gap: 16px;">
+    <img src="logo.png" alt="Logo" style="height:60px;width:60px;object-fit:contain;background:rgba(56,189,248,0.1);border-radius:12px;padding:4px;border:2px solid #38bdf8;" onerror="this.style.display='none'">
+    <div style="display: flex; flex-direction: column;">
+      <div style="font-size: 1.5em; font-weight: bold; color: #38bdf8; line-height: 1.2;">AFKJ - Helios</div>
+      <div style="font-size: 0.95em; color: #94a3b8; line-height: 1.2;">Game Mode Formations</div>
+    </div>
+  </div>
+  <div class="header-selectors" style="flex: 1; padding-left: 24px; padding-right: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; box-sizing: border-box;">
+    <select id="gameModeSelector" style="padding: 10px 16px; background: #2a2a3e; color: white; border: 2px solid #38bdf8; border-radius: 6px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation; font-weight: 600;">
+      <option value="battle">Battle Drills</option>
+      <option value="guild">Guild Supremacy</option>
+      <option value="clash">Clash Fronts</option>
+      <option value="dream">Dream Realm</option>
+    </select>
+    <select id="languageSelector" onchange="changeLanguage(this.value)" style="padding: 10px 16px; background: #2a2a3e; color: white; border: 2px solid #4a9eff; border-radius: 6px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation; font-weight: 600; box-sizing: border-box;">
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+      <option value="ru">Русский</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+    </select>
+  </div>
+</div>
+<style>
+@media (max-width: 1024px) {
+  .header-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  .header-container > div:first-child {
+    flex: 1 1 auto !important;
+    max-width: 100% !important;
+    justify-content: center;
+  }
+  .header-selectors {
+    padding-left: 0 !important;
+    justify-content: center !important;
+  }
+}
+@media (max-width: 768px) {
+  .header-container {
+    padding: 10px 12px !important;
+  }
+  .header-selectors {
+    flex-direction: column;
+    gap: 8px !important;
+  }
+  .header-selectors select {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .header-container img {
+    height: 50px !important;
+    width: 50px !important;
+  }
+}
+</style>
+<div class="container">
+  <div id="modeContent">
+    <!-- Content for the selected mode will be rendered here -->
+  </div>
+</div>
+
+<script>
+// Game mode logic
+let currentMode = 'battle';
+
+const MODES = {
+  battle: {
+    title: "Battle Drills Teams Recommendations",
+    render: function() {
+      const mapOptions = battleMaps.map(m => 
+        `<option value="${m.id}" ${m.id === selectedMap ? 'selected' : ''}>${m.name}${m.isCurrent ? ' (Current)' : ''}</option>`
+      ).join('');
+      
+      return `
+      <div class="main-section" style="display:flex;flex-direction:row;gap:24px;width:100%;align-items:flex-start;">
+        <div class="left-panel">
+          <h2 data-i18n="battleMap">Battle Map</h2>
+          <div style="margin-bottom: 20px;">
+            <select id="mapSelector" onchange="selectMap(this.value)" style="padding: 10px; width: 100%; background: #1e293b; color: white; border: 2px solid #38bdf8; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation;">
+              ${mapOptions}
+            </select>
+          </div>
+          
+          <h2 data-i18n="bossType">Boss Type</h2>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <button id="btnEndboss" onclick="selectBossType('endboss')" style="padding: 12px; cursor: pointer; background: #4a9eff; color: white; border: 2px solid #4a9eff; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation;" data-i18n="endboss">Endboss</button>
+            
+            <!-- Single miniboss button (for Verdshroom) -->
+            <button id="btnMiniboss" onclick="selectMiniboss()" style="padding: 12px; cursor: pointer; background: white; color: #333; border: 2px solid #ddd; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: none;" data-i18n="minibosses">Minibosses</button>
+            
+            <!-- Miniboss dropdown (for maps with multiple different miniboss comps) -->
+            <div id="minibossDropdownContainer" style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: bold; color: #e5e7eb;" data-i18n="minibosses">Minibosses</label>
+              <select id="minibossSelector" onchange="selectMiniboss(this.value)" style="padding: 10px; background: #1e293b; color: white; border: 2px solid #4a9eff; border-radius: 4px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation;">
+                <option value="">-- Select Miniboss --</option>
+              </select>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: bold; color: #e5e7eb;" data-i18n="strongholds">Strongholds</label>
+              <select id="strongholdSelector" onchange="selectStronghold(this.value)" style="padding: 10px; background: #1e293b; color: white; border: 2px solid #4a9eff; border-radius: 4px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation;">
+                <option value="">-- Select Stronghold --</option>
+                <option value="red">Red Stronghold</option>
+                <option value="blue">Blue Stronghold</option>
+                <option value="green">Green Stronghold</option>
+              </select>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: bold; color: #e5e7eb;">Cleanup</label>
+              <select id="cleanupSelector" onchange="selectCleanup(this.value)" style="padding: 10px; background: #1e293b; color: white; border: 2px solid #4a9eff; border-radius: 4px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation;">
+                <option value="">-- Select Cleanup --</option>
+                <option value="cleanup">Cleanup Teams</option>
+              </select>
+            </div>
+          </div>
+          
+          
+          <h2 data-i18n="filters">Filters</h2>
+          <div><strong data-i18n="classes">Classes</strong></div>
+          <div id="classFilters" class="icon-row"></div>
+          <div><strong data-i18n="factions">Factions</strong></div>
+          <div id="factionFilters" class="icon-row"></div>
+          <div style="margin-top: 20px; text-align: center;">
+            <h3 style="margin-bottom: 10px; color: #e5e7eb;" data-i18n="battleMap">Battle Map</h3>
+            <div id="battleMapContainer" style="position: relative; display: inline-block; max-width: 100%;">
+              <img id="battleMapImage" src="comps/battle/${selectedMap}/map.jpg" alt="Battle Map" style="width: 100%; height: auto; border-radius: 8px; border: 2px solid #38bdf8; display: block;" onerror="this.style.display='none'">
+              <svg id="battleMapOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></svg>
+            </div>
+          </div>
+        </div>
+        <div class="right-panel">
+          <h2 data-i18n="heroes">Heroes (click to disable)</h2>
+          <div id="heroGrid" class="hero-grid"></div>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #4a9eff;">
+            <div id="formationAndTeamsContainer" style="display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; padding-bottom: 10px;">
+              <div id="formationRefContainer" style="flex: 0 0 260px; width: 260px;">
+                <h3 style="margin-bottom: 10px; color: #e5e7eb; text-align: center; font-size: 14px;" data-i18n="formationRef">Formation Reference</h3>
+                <img id="formationRefImage" src="comps/battle/${selectedMap}/empty.png" alt="Formation Template" style="width: 100%; height: auto; border-radius: 8px; border: 2px solid #4a9eff;">
+              </div>
+              <div id="result" style="display: flex; gap: 16px; flex-wrap: nowrap;"></div>
+            </div>
+            <div id="exportButtonContainer" style="margin-top: 20px;"></div>
+          </div>
+        </div>
+      </div>
+      `;
+    }
+  },
+  guild: {
+    title: "Guild Supremacy (Coming Soon)",
+    render: function() {
+      return `<div style=\"text-align:center;padding:60px 0;\"><h2>Guild Supremacy</h2><p>Mode coming soon!</p></div>`;
+    }
+  },
+  clash: {
+    title: "Clash Fronts (Coming Soon)",
+    render: function() {
+      return `<div style=\"text-align:center;padding:60px 0;\"><h2>Clash Fronts</h2><p>Mode coming soon!</p></div>`;
+    }
+  },
+  dream: {
+    title: "Dream Realm (Coming Soon)",
+    render: function() {
+      return `<div style=\"text-align:center;padding:60px 0;\"><h2>Dream Realm</h2><p>Mode coming soon!</p></div>`;
+    }
+  }
+};
+
+async function renderMode(mode) {
+  currentMode = mode;
+  const modeObj = MODES[mode] || MODES.battle;
+  const modeContentEl = document.getElementById('modeContent');
+  
+  if (!modeContentEl) {
+    console.error('modeContent element not found!');
+    return;
+  }
+  
+  // Clear existing auto-refresh interval
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+  }
+  
+  // Scroll to top when switching modes
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Load mode-specific data before rendering
+  if (mode === 'battle') {
+    await loadBattleMaps();
+  }
+  
+  modeContentEl.innerHTML = modeObj.render();
+  // document.getElementById('modeTitle').textContent = modeObj.title; // Removed as part of header redesign
+  
+  // Load mode-specific data and render
+  if (mode === 'battle') {
+    await Promise.all([loadTilePositions(), loadComps()]);
+    renderAll();
+    
+    // Setup miniboss selector (button vs dropdown based on map)
+    populateMinibossDropdown();
+    
+    // Set up boss overlay rendering when map image loads
+    const battleMapImg = document.getElementById('battleMapImage');
+    if (battleMapImg) {
+      if (battleMapImg.complete && battleMapImg.naturalWidth > 0) {
+        // Image already loaded
+        renderBossOverlay();
+      } else {
+        // Wait for image to load
+        battleMapImg.onload = () => renderBossOverlay();
+      }
+    }
+  }
+  
+  // Start auto-refresh polling every 2 seconds to detect admin changes (for all modes)
+  autoRefreshInterval = setInterval(async () => {
+    await loadComps();
+  }, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const selector = document.getElementById('gameModeSelector');
+  selector.addEventListener('change', function() {
+    renderMode(this.value);
+  });
+  renderMode(selector.value);
+});
+
+// Translation system - load from external JSON file
+let TRANSLATIONS = {};
+let translationsLoaded = false;
+
+async function loadTranslations() {
+  if (translationsLoaded) return TRANSLATIONS;
+  try {
+    const response = await fetch('translations.json');
+    TRANSLATIONS = await response.json();
+    translationsLoaded = true;
+    return TRANSLATIONS;
+  } catch (error) {
+    console.error('Failed to load translations:', error);
+    // Fallback to English if loading fails
+    TRANSLATIONS = { en: {} };
+    translationsLoaded = true;
+    return TRANSLATIONS;
+  }
+}
+
+let currentLang = localStorage.getItem('language') || 'en';
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('language', lang);
+  
+  if (!translationsLoaded) {
+    console.warn('Translations not loaded yet');
+    return;
+  }
+  
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+      el.textContent = TRANSLATIONS[lang][key];
+    }
+  });
+  
+  // Re-render results if they exist to update translated hints and headers
+  const result = document.getElementById('result');
+  if (result && result.innerHTML.trim() !== '') {
+    recommend();
+  }
+}
+
+// Apply saved language on page load
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadTranslations();
+  document.getElementById('languageSelector').value = currentLang;
+  changeLanguage(currentLang);
+});
+
+let tilePositions = {};
+
+async function loadBattleMaps() {
+  try {
+    const data = await fetch('comps/battle/maps.json').then(r => r.json());
+    battleMaps = data.maps;
+    // Set the current map as default
+    const currentMap = battleMaps.find(m => m.isCurrent);
+    if (currentMap) {
+      selectedMap = currentMap.id;
+      currentBossPositions = currentMap.bossPositions || [];
+      currentMinibosses = currentMap.minibosses || [];
+    }
+    console.log('Loaded battle maps:', battleMaps);
+  } catch (e) {
+    console.warn('Could not load maps.json, using default', e);
+    battleMaps = [{ id: 'desolate-grounds', name: 'Desolate Grounds', isCurrent: true }];
+    selectedMap = 'desolate-grounds';
+    currentBossPositions = [];
+  }
+}
+
+async function loadTilePositions() {
+  const modeFolder = MODES[currentMode]?.folder || 'battle';
+  let tilePath = `comps/${modeFolder}/tiles.json`;
+  
+  // For battle mode, use map-specific folder
+  if (currentMode === 'battle' && selectedMap) {
+    tilePath = `comps/${modeFolder}/${selectedMap}/tiles.json`;
+  }
+  
+  try {
+    tilePositions = await fetch(tilePath).then(r => r.json());
+    console.log(`Loaded tile positions for ${currentMode}:`, tilePositions);
+  } catch (e) {
+    console.warn(`Could not load tiles.json for ${currentMode}, using default positions`, e);
+    tilePositions = {
+      "1": { x: 50, y: 50, size: 128 },
+      "2": { x: 200, y: 50, size: 128 },
+      "3": { x: 350, y: 50, size: 128 },
+      "4": { x: 500, y: 50, size: 128 },
+      "5": { x: 650, y: 50, size: 128 }
+    };
+  }
+}
+
+let lastCompsHash = '';
+let autoRefreshInterval = null;
+
+async function loadComps() {
+  const modeFolder = MODES[currentMode]?.folder || 'battle';
+  let compsPath = `comps/${modeFolder}/comps.json`;
+  
+  // For battle mode, load from battle-drills folder with boss-type-specific subfolders
+  if (currentMode === 'battle' && selectedMap) {
+    const basePath = `comps/battle-drills/${selectedMap}`;
+    const subfolders = ['endboss', 'miniboss', 'stronghold-red', 'stronghold-green', 'stronghold-blue', 'cleanup'];
+    
+    try {
+      // Load comps from all boss-type-specific folders
+      const allComps = [];
+      
+      for (const subfolder of subfolders) {
+        const path = `${basePath}/${subfolder}/comps.json`;
+        try {
+          const data = await fetch(`${path}?t=${Date.now()}`).then(r => r.json());
+          if (data.teams && Array.isArray(data.teams)) {
+            allComps.push(...data.teams);
+          }
+        } catch (err) {
+          console.warn(`Could not load comps from ${path}:`, err);
+        }
+      }
+      
+      const newHash = JSON.stringify(allComps);
+      const hasChanged = lastCompsHash !== '' && lastCompsHash !== newHash;
+      lastCompsHash = newHash;
+      comps = allComps;
+      console.log(`Loaded ${comps.length} total comps for ${currentMode} from all boss types:`, comps);
+      
+      // Auto-refresh recommendations if data changed
+      if (hasChanged) {
+        console.log('Comps data changed, auto-refreshing recommendations...');
+        const result = document.getElementById('result');
+        if (result && result.innerHTML.trim() !== '') {
+          recommend();
+        }
+      }
+      return; // Successfully loaded from battle-drills
+    } catch (e) {
+      console.warn('Could not load battle-drills comps, will try fallback path', e);
+    }
+  }
+  
+  // Fallback: use original single-file loading for other modes
+  try {
+    // Add timestamp to prevent caching
+    const data = await fetch(`${compsPath}?t=${Date.now()}`).then(r => r.json());
+    const newHash = JSON.stringify(data.teams);
+    const hasChanged = lastCompsHash !== '' && lastCompsHash !== newHash;
+    lastCompsHash = newHash;
+    comps = data.teams;
+    console.log(`Loaded comps for ${currentMode}:`, comps);
+    
+    // Auto-refresh recommendations if data changed
+    if (hasChanged) {
+      console.log('Comps data changed, auto-refreshing recommendations...');
+      const result = document.getElementById('result');
+      if (result && result.innerHTML.trim() !== '') {
+        recommend();
+      }
+    }
+  } catch (e) {
+    console.warn(`Could not load comps from JSON for ${currentMode}, using defaults`, e);
+    comps = [
+      {
+        id: "team1",
+        name: "Team 1",
+        image: "above50/image.png",
+        heroes: [
+          { name: "Cassadee", damage: 12 },
+          { name: "Alsa", damage: 7 }
+        ],
+        conditions: {
+          bossHpAbove: 50
+        }
+      }
+    ];
+  }
+}
+
+/* ==========================
+   HERO REGISTRY
+========================== */
+const HEROES = {
+  Aliceth: { name:"Aliceth", class:"Marksman", faction:"Celestial", icon:"heroes/Aliceth.png" },
+  Alna: { name:"Alna", class:"Tank", faction:"Celestial", icon:"heroes/Alna.png" },
+  Alsa: { name:"Alsa", class:"Mage", faction:"Mauler", icon:"heroes/Alsa.png" },
+  Antandra: { name:"Antandra", class:"Tank", faction:"Mauler", icon:"heroes/Antandra.png" },
+  Arden: { name:"Arden", class:"Mage", faction:"Wilder", icon:"heroes/Arden.png" },
+  Atalanta: { name:"Atalanta", class:"Marksman", faction:"Lightbearer", icon:"heroes/Atalanta.png" },
+  Athalia: { name:"Athalia", class:"Rogue", faction:"Celestial", icon:"heroes/Athalia.png" },
+  Aurora: { name:"Aurora", class:"Mage", faction:"Celestial", icon:"heroes/Aurora.png" },
+  Baelran: { name:"Baelran", class:"Warrior", faction:"Celestial", icon:"heroes/Baelran.png" },
+  Berial: { name:"Berial", class:"Rogue", faction:"Hypogean", icon:"heroes/Berial.png" },
+  Bonnie: { name:"Bonnie", class:"Marksman", faction:"Graveborn", icon:"heroes/Bonnie.png" },
+  Brutus: { name:"Brutus", class:"Warrior", faction:"Mauler", icon:"heroes/Brutus.png" },
+  Bryon: { name:"Bryon", class:"Marksman", faction:"Wilder", icon:"heroes/Bryon.png" },
+  Callan: { name:"Callan", class:"Tank", faction:"Graveborn", icon:"heroes/Callan.png" },
+  Carolina: { name:"Carolina", class:"Mage", faction:"Graveborn", icon:"heroes/Carolina.png" },
+  Cassadee: { name:"Cassadee", class:"Mage", faction:"Lightbearer", icon:"heroes/Cassadee.png" },
+  Cecia: { name:"Cecia", class:"Marksman", faction:"Graveborn", icon:"heroes/Cecia.png" },
+  Chippy: { name:"Chippy", class:"Tank", faction:"Lightbearer", icon:"heroes/Chippy.png" },
+  Cryonaia: { name:"Cryonaia", class:"Mage", faction:"Hypogean", icon:"heroes/Cryonaia.png" },
+  Cyran: { name:"Cyran", class:"Mage", faction:"Lightbearer", icon:"heroes/Cyran.png" },
+  Daimon: { name:"Daimon", class:"Tank", faction:"Graveborn", icon:"heroes/Daimon.png" },
+  Damian: { name:"Damian", class:"Support", faction:"Wilder", icon:"heroes/Damian.png" },
+  Dionel: { name:"Dionel", class:"Marksman", faction:"Celestial", icon:"heroes/Dionel.png" },
+  Dunlingr: { name:"Dunlingr", class:"Tank", faction:"Celestial", icon:"heroes/Dunlingr.png" },
+  Eironn: { name:"Eironn", class:"Rogue", faction:"Wilder", icon:"heroes/Eironn.png" },
+  Elijah: { name:"Elijah", class:"Support", faction:"Celestial", icon:"heroes/Elijah.png" },
+  Faramor: { name:"Faramor", class:"Rogue", faction:"Wilder", icon:"heroes/Faramor.png" },
+  Lailah: { name:"Lailah", class:"Support", faction:"Celestial", icon:"heroes/Lailah.png" },
+  Fay: { name:"Fay", class:"Support", faction:"Lightbearer", icon:"heroes/Fay.png" },
+  Florabelle: { name:"Florabelle", class:"Warrior", faction:"Wilder", icon:"heroes/Florabelle.png" },
+  Gala: { name:"Gala", class:"Mage", faction:"Mauler", icon:"heroes/Gala.png" },
+  Gerda: { name:"Gerda", class:"Tank", faction:"Mauler", icon:"heroes/Gerda.png" },
+  Granny_Dahnie: { name:"Granny Dahnie", class:"Tank", faction:"Wilder", icon:"heroes/Granny Dahnie.png" },
+  Hammie: { name:"Hammie", class:"Mage", faction:"Lightbearer", icon:"heroes/Hammie.png" },
+  Harak: { name:"Harak", class:"Warrior", faction:"Hypogean", icon:"heroes/Harak.png" },
+  Hewynn: { name:"Hewynn", class:"Support", faction:"Wilder", icon:"heroes/Hewynn.png" },
+  Hodgkin: { name:"Hodgkin", class:"Warrior", faction:"Graveborn", icon:"heroes/Hodgkin.png" },
+  Hugin: { name:"Hugin", class:"Support", faction:"Lightbearer", icon:"heroes/Hugin.png" },
+  Igor: { name:"Igor", class:"Warrior", faction:"Graveborn", icon:"heroes/Igor.png" },
+  Indris: { name:"Indris", class:"Marksman", faction:"Wilder", icon:"heroes/Indris.png" },
+  Isabella: { name:"Isabella", class:"Support", faction:"Graveborn", icon:"heroes/Isabella.png" },
+  Kafra: { name:"Kafra", class:"Warrior", faction:"Wilder", icon:"heroes/Kafra.png" },
+  Koko: { name:"Koko", class:"Support", faction:"Mauler", icon:"heroes/Koko.png" },
+  Kordan: { name:"Kordan", class:"Warrior", faction:"Mauler", icon:"heroes/Kordan.png" },
+  Korin: { name:"Korin", class:"Warrior", faction:"Lightbearer", icon:"heroes/Korin.png" },
+  Kruger: { name:"Kruger", class:"Warrior", faction:"Mauler", icon:"heroes/Kruger.png" },
+  Kulu: { name:"Kulu", class:"Marksman", faction:"Hypogean", icon:"heroes/Kulu.png" },
+  Laios: { name:"Laios", class:"Warrior", faction:"Dimensional", icon:"heroes/Laios.png" },
+  Lenya: { name:"Lenya", class:"Rogue", faction:"Wilder", icon:"heroes/Lenya.png" },
+  Lily_May: { name:"Lily May", class:"Rogue", faction:"Wilder", icon:"heroes/Lily May.png" },
+  Lorsan: { name:"Lorsan", class:"Support", faction:"Wilder", icon:"heroes/Lorsan.png" },
+  Lucca: { name:"Lucca", class:"Tank", faction:"Lightbearer", icon:"heroes/Lucca.png" },
+  Lucius: { name:"Lucius", class:"Tank", faction:"Lightbearer", icon:"heroes/Lucius.png" },
+  Lucy: { name:"Lucy", class:"Mage", faction:"Dimensional", icon:"heroes/Lucy.png" },
+  Ludovic: { name:"Ludovic", class:"Support", faction:"Graveborn", icon:"heroes/Ludovic.png" },
+  Lumont: { name:"Lumont", class:"Tank", faction:"Mauler", icon:"heroes/Lumont.png" },
+  Lyca: { name:"Lyca", class:"Marksman", faction:"Wilder", icon:"heroes/Lyca.png" },
+  Marcille: { name:"Marcille", class:"Mage", faction:"Dimensional", icon:"heroes/Marcille.png" },
+  Marilee: { name:"Marilee", class:"Marksman", faction:"Lightbearer", icon:"heroes/Marilee.png" },
+  Mehira: { name:"Mehira", class:"Mage", faction:"Hypogean", icon:"heroes/Mehira.png" },
+  Mikola: { name:"Mikola", class:"Support", faction:"Mauler", icon:"heroes/Mikola.png" },
+  Mirael: { name:"Mirael", class:"Mage", faction:"Lightbearer", icon:"heroes/Mirael.png" },
+  Nara: { name:"Nara", class:"Rogue", faction:"Graveborn", icon:"heroes/Nara.png" },
+  Natsu: { name:"Natsu", class:"Warrior", faction:"Dimensional", icon:"heroes/Natsu.png" },
+  Nazrik: { name:"Nazrik", class:"Marksman", faction:"Mauler", icon:"heroes/Nazrik.png" },
+  Niru: { name:"Niru", class:"Support", faction:"Graveborn", icon:"heroes/Niru.png" },
+  Odie: { name:"Odie", class:"Marksman", faction:"Mauler", icon:"heroes/Odie.png" },
+  Pandora: { name:"Pandora", class:"Support", faction:"Dimensional", icon:"heroes/Pandora.png" },
+  Pang: { name:"Pang", class:"Warrior", faction:"Wilder", icon:"heroes/Pang.png" },
+  Parisa: { name:"Parisa", class:"Mage", faction:"Wilder", icon:"heroes/Parisa.png" },
+  Perseus: { name:"Perseus", class:"Warrior", faction:"Lightbearer", icon:"heroes/Perseus.png" },
+  Phraesto: { name:"Phraesto", class:"Tank", faction:"Hypogean", icon:"heroes/Phraesto.png" },
+  Phraesto_Clone: { name:"Phraesto Clone", class:"Tank", faction:"Hypogean", icon:"heroes/Phraesto Clone.png" },
+  Ravion: { name:"Ravion", class:"Rogue", faction:"Wilder", icon:"heroes/Ravion.png" },
+  Reinier: { name:"Reinier", class:"Support", faction:"Hypogean", icon:"heroes/Reinier.png" },
+  Rhys: { name:"Rhys", class:"Marksman", faction:"Mauler", icon:"heroes/Rhys.png" },
+  Rowan: { name:"Rowan", class:"Support", faction:"Lightbearer", icon:"heroes/Rowan.png" },
+  Saida: { name:"Saida", class:"Rogue", faction:"Hypogean", icon:"heroes/Saida.png" },
+  Salazer: { name:"Salazer", class:"Rogue", faction:"Graveborn", icon:"heroes/Salazer.png" },
+  Satrana: { name:"Satrana", class:"Mage", faction:"Mauler", icon:"heroes/Satrana.png" },
+  Scarlita: { name:"Scarlita", class:"Warrior", faction:"Celestial", icon:"heroes/Scarlita.png" },
+  Seth: { name:"Seth", class:"Rogue", faction:"Mauler", icon:"heroes/Seth.png" },
+  Shadewing: { name:"Shadewing", class:"Rogue", faction:"Graveborn", icon:"heroes/Shadewing.png" },
+  Shakir: { name:"Shakir", class:"Rogue", faction:"Mauler", icon:"heroes/Shakir.png" },
+  Shemira: { name:"Shemira", class:"Mage", faction:"Graveborn", icon:"heroes/Shemira.png" },
+  Silven: { name:"Silven", class:"Marksman", faction:"Lightbearer", icon:"heroes/Silven.png" },
+  Silvina: { name:"Silvina", class:"Rogue", faction:"Graveborn", icon:"heroes/Silvina.png" },
+  Sinbad: { name:"Sinbad", class:"Rogue", faction:"Lightbearer", icon:"heroes/Sinbad.png" },
+  Smokey_and_Meerky: { name:"Smokey & Meerky", class:"Support", faction:"Mauler", icon:"heroes/Smokey & Meerky.png" },
+  Solise: { name:"Solise", class:"Support", faction:"Wilder", icon:"heroes/Solise.png" },
+  Sonja: { name:"Sonja", class:"Warrior", faction:"Lightbearer", icon:"heroes/Sonja.png" },
+  Soren: { name:"Soren", class:"Rogue", faction:"Mauler", icon:"heroes/Soren.png" },
+  Talene: { name:"Talene", class:"Mage", faction:"Celestial", icon:"heroes/Talene.png" },
+  Tasi: { name:"Tasi", class:"Mage", faction:"Wilder", icon:"heroes/Tasi.png" },
+  Temesia: { name:"Temesia", class:"Tank", faction:"Lightbearer", icon:"heroes/Temesia.png" },
+  Thador: { name:"Thador", class:"Tank", faction:"Wilder", icon:"heroes/Thador.png" },
+  Thoran: { name:"Thoran", class:"Tank", faction:"Graveborn", icon:"heroes/Thoran.png" },
+  Tilaya: { name:"Tilaya", class:"Warrior", faction:"Wilder", icon:"heroes/Tilaya.png" },
+  Ulmus: { name:"Ulmus", class:"Tank", faction:"Wilder", icon:"heroes/Ulmus.png" },
+  Vala: { name:"Vala", class:"Rogue", faction:"Lightbearer", icon:"heroes/Vala.png" },
+  Valen: { name:"Valen", class:"Warrior", faction:"Lightbearer", icon:"heroes/Valen.png" },
+  Valka: { name:"Valka", class:"Warrior", faction:"Graveborn", icon:"heroes/Valka.png" },
+  Velara: { name:"Velara", class:"Support", faction:"Wilder", icon:"heroes/Velara.png" },
+  Viperian: { name:"Viperian", class:"Mage", faction:"Graveborn", icon:"heroes/Viperian.png" },
+  Walker: { name:"Walker", class:"Rogue", faction:"Lightbearer", icon:"heroes/Walker.png" },
+  Zandrok: { name:"Zandrok", class:"Warrior", faction:"Mauler", icon:"heroes/Zandrok.png" },
+  Zanie: { name:"Zanie", class:"Marksman", faction:"Lightbearer", icon:"heroes/Zanie.png" },
+  Zanie_Turret: { name:"Zanie Turret", class:"Marksman", faction:"Lightbearer", icon:"heroes/Zanie Turret.png" }
+};
+
+/* ==========================
+   ARTIFACT DEFINITIONS
+========================== */
+const ARTIFACTS = {
+  Arcanewild: { name:"Arcanewild", icon:"artifacts/Arcanewild.png" },
+  Awakening: { name:"Awakening", icon:"artifacts/Awakening.png" },
+  Bladechaser: { name:"Bladechaser", icon:"artifacts/Bladechaser.png" },
+  Blazeburn: { name:"Blazeburn", icon:"artifacts/Blazeburn.png" },
+  Blazing: { name:"Blazing", icon:"artifacts/Blazing.png" },
+  Bulwark: { name:"Bulwark", icon:"artifacts/Bulwark.png" },
+  Confining: { name:"Confining", icon:"artifacts/Confining.png" },
+  Crescent: { name:"Crescent", icon:"artifacts/Crescent.png" },
+  Earthshell: { name:"Earthshell", icon:"artifacts/Earthshell.png" },
+  Enlightening: { name:"Enlightening", icon:"artifacts/Enlightening.png" },
+  Ironwall: { name:"Ironwall", icon:"artifacts/Ironwall.png" },
+  Lightheal: { name:"Lightheal", icon:"artifacts/Lightheal.png" },
+  Manawake: { name:"Manawake", icon:"artifacts/Manawake.png" },
+  Razorbeam: { name:"Razorbeam", icon:"artifacts/Razorbeam.png" },
+  Resonating: { name:"Resonating", icon:"artifacts/Resonating.png" },
+  Rockbind: { name:"Rockbind", icon:"artifacts/Rockbind.png" },
+  Starshard: { name:"Starshard", icon:"artifacts/Starshard.png" },
+  Starshower: { name:"Starshower", icon:"artifacts/Starshower.png" }
+};
+
+/* ==========================
+   FILTER DEFINITIONS
+========================== */
+const CLASSES = [
+  { id:"Tank", icon:"classes/tank.png" },
+  { id:"Support", icon:"classes/support.png" },
+  { id:"Marksman", icon:"classes/marksman.png" },
+  { id:"Mage", icon:"classes/mage.png" },
+  { id:"Rogue", icon:"classes/rogue.png" },
+  { id:"Warrior", icon:"classes/warrior.png" }
+];
+
+const FACTIONS = [
+  { id:"Lightbearer", icon:"factions/lightbearer.png" },
+  { id:"Wilder", icon:"factions/wilder.png" },
+  { id:"Mauler", icon:"factions/mauler.png" },
+  { id:"Graveborn", icon:"factions/graveborn.png" },
+  { id:"Celestial", icon:"factions/celestial.png" },
+  { id:"Hypogean", icon:"factions/hypogean.png" },
+  { id:"Dimensional", icon:"factions/dimensional.png" }
+];
+
+let comps = [];
+let battleMaps = [];
+let selectedMap = 'desolate-grounds';
+let currentBossPositions = [];
+let currentMinibosses = [];
+const missingHeroes = new Set();
+const activeClasses = new Set();
+const activeFactions = new Set();
+
+/* ==========================
+   RENDER FILTER ICONS
+========================== */
+function renderIconRow(containerId, items, activeSet) {
+  const c = document.getElementById(containerId);
+  if (!c) {
+    console.warn(`Container ${containerId} not found`);
+    return;
+  }
+  c.innerHTML = "";
+  items.forEach(i => {
+    const img = document.createElement("img");
+    img.src = i.icon;
+    img.title = i.id;
+    img.className = activeSet.has(i.id) ? "active" : "";
+    img.onclick = () => {
+      if (activeSet.has(i.id)) {
+        activeSet.delete(i.id);
+      } else {
+        activeSet.clear();
+        activeSet.add(i.id);
+      }
+      renderAll();
+    };
+    c.appendChild(img);
+  });
+}
+
+/* ==========================
+   BOSS POSITION OVERLAY
+========================== */
+function renderBossOverlay() {
+  const img = document.getElementById('battleMapImage');
+  const svg = document.getElementById('battleMapOverlay');
+  
+  if (!img || !svg) {
+    return;
+  }
+  
+  // Clear existing overlay first
+  svg.innerHTML = '';
+  
+  // If no boss positions for this map, stop here
+  if (currentBossPositions.length === 0) {
+    return;
+  }
+  
+  // Get image dimensions
+  const imgWidth = img.naturalWidth;
+  const imgHeight = img.naturalHeight;
+  
+  if (!imgWidth || !imgHeight) {
+    console.warn('Image not loaded yet, cannot render boss overlay');
+    return;
+  }
+  
+  // Set SVG viewBox to match image dimensions
+  svg.setAttribute('viewBox', `0 0 ${imgWidth} ${imgHeight}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  
+  // Define color mapping
+  const colorMap = {
+    red: '#ef4444',
+    blue: '#3b82f6',
+    green: '#10b981',
+    miniboss: '#f59e0b',
+    endboss: '#a855f7'
+  };
+  
+  // Draw each boss position
+  currentBossPositions.forEach(pos => {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    // Determine color
+    let color;
+    if (pos.type === 'stronghold') {
+      color = colorMap[pos.color] || '#888';
+    } else if (pos.type === 'miniboss') {
+      color = colorMap.miniboss;
+    } else if (pos.type === 'endboss') {
+      color = colorMap.endboss;
+    }
+    
+    // Draw circle
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', pos.x);
+    circle.setAttribute('cy', pos.y);
+    circle.setAttribute('r', 50);
+    circle.setAttribute('fill', color);
+    circle.setAttribute('fill-opacity', '0.6');
+    circle.setAttribute('stroke', 'white');
+    circle.setAttribute('stroke-width', '4');
+    group.appendChild(circle);
+    
+    // Draw order number
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', pos.x);
+    text.setAttribute('y', pos.y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('fill', 'white');
+    text.setAttribute('font-size', '48');
+    text.setAttribute('font-weight', 'bold');
+    text.setAttribute('font-family', 'Arial, sans-serif');
+    text.textContent = pos.order;
+    group.appendChild(text);
+    
+    svg.appendChild(group);
+  });
+  
+  console.log(`Rendered ${currentBossPositions.length} boss positions on map overlay`);
+}
+
+/* ==========================
+   HERO GRID
+========================== */
+function heroAllowed(hero) {
+  if (activeClasses.size && !activeClasses.has(hero.class)) return false;
+  if (activeFactions.size && !activeFactions.has(hero.faction)) return false;
+  return true;
+}
+
+function renderHeroes() {
+  const heroGrid = document.getElementById('heroGrid');
+  if (!heroGrid) return;
+  
+  heroGrid.innerHTML = "";
+  
+  // Sort heroes by faction, then by class
+  const factionOrder = ["Lightbearer", "Wilder", "Mauler", "Graveborn", "Celestial", "Hypogean", "Dimensional"];
+  const classOrder = ["Tank", "Support", "Marksman", "Mage", "Rogue", "Warrior"];
+  
+  const sortedHeroes = Object.values(HEROES)
+    .filter(hero => heroAllowed(hero))
+    .sort((a, b) => {
+      const factionDiff = factionOrder.indexOf(a.faction) - factionOrder.indexOf(b.faction);
+      if (factionDiff !== 0) return factionDiff;
+      return classOrder.indexOf(a.class) - classOrder.indexOf(b.class);
+    });
+  
+  sortedHeroes.forEach(hero => {
+    const img = document.createElement("img");
+    img.src = hero.icon;
+    img.title = `${hero.name} (${hero.class}, ${hero.faction})`;
+    img.className = missingHeroes.has(hero.name) ? "missing" : "";
+
+    img.onclick = () => {
+      missingHeroes.has(hero.name)
+        ? missingHeroes.delete(hero.name)
+        : missingHeroes.add(hero.name);
+      renderAll();
+    };
+
+    heroGrid.appendChild(img);
+  });
+}
+
+/* ==========================
+   OPTIMIZER
+========================== */
+function compDamage(c) {
+  return c.heroes.reduce((s,h)=>s+h.damage,0);
+}
+
+function conditionsMet(c, hp) {
+  if (c.conditions?.bossHpBelow !== undefined && hp >= c.conditions.bossHpBelow) return false;
+  if (c.conditions?.bossHpAbove !== undefined && hp <= c.conditions.bossHpAbove) return false;
+  return true;
+}
+
+// Helper function to get the list of heroes that a comp will actually use
+// This is used to track heroes globally across teams
+function getCompHeroes(c, globalUsedHeroes = new Set()) {
+  const heroes = [];
+  const localUsedHeroes = new Set(globalUsedHeroes);
+  
+  // Helper to get active hero for a slot
+  const getSlotActiveHero = (heroSlot) => {
+    // Check primary
+    const primaryHero = HEROES[heroSlot.name];
+    if (primaryHero && !missingHeroes.has(heroSlot.name) && !localUsedHeroes.has(heroSlot.name)) {
+      return heroSlot.name;
+    }
+    
+    // Check replacements
+    if (heroSlot.replacements) {
+      for (const replacement of heroSlot.replacements) {
+        const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+        const isOverride = typeof replacement === 'object' && replacement.heroesOverride;
+        
+        if (!isOverride) {
+          const replacementHero = HEROES[replacementName];
+          if (replacementHero && !missingHeroes.has(replacementName) && !localUsedHeroes.has(replacementName)) {
+            return replacementName;
+          }
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  // Check if we need to use a heroesOverride
+  let useOverride = false;
+  let overrideHeroes = null;
+  
+  for (const h of c.heroes) {
+    if (h.replacements) {
+      const primaryHero = HEROES[h.name];
+      const primaryAvailable = primaryHero && !missingHeroes.has(h.name) && !localUsedHeroes.has(h.name);
+      
+      if (!primaryAvailable) {
+        // Check for simple replacements first
+        let foundSimpleReplacement = false;
+        for (const replacement of h.replacements) {
+          const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+          const isOverride = typeof replacement === 'object' && replacement.heroesOverride;
+          
+          if (!isOverride) {
+            const replacementHero = HEROES[replacementName];
+            if (replacementHero && !missingHeroes.has(replacementName) && !localUsedHeroes.has(replacementName)) {
+              foundSimpleReplacement = true;
+              break;
+            }
+          }
+        }
+        
+        // If no simple replacement, check for override
+        if (!foundSimpleReplacement) {
+          for (const replacement of h.replacements) {
+            if (typeof replacement === 'object' && replacement.heroesOverride) {
+              const replacementHero = HEROES[replacement.name];
+              if (replacementHero && !missingHeroes.has(replacement.name) && !localUsedHeroes.has(replacement.name)) {
+                // Check if all override heroes are available
+                const allAvailable = replacement.heroesOverride.every(oh => {
+                  const hero = HEROES[oh.name];
+                  if (hero && !missingHeroes.has(oh.name) && !localUsedHeroes.has(oh.name)) return true;
+                  
+                  // Check replacements for this override hero
+                  if (oh.replacements) {
+                    return oh.replacements.some(rep => {
+                      const repName = typeof rep === 'string' ? rep : rep.name;
+                      const repHero = HEROES[repName];
+                      return repHero && !missingHeroes.has(repName) && !localUsedHeroes.has(repName);
+                    });
+                  }
+                  
+                  return false;
+                });
+                
+                if (allAvailable) {
+                  useOverride = true;
+                  overrideHeroes = replacement.heroesOverride;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (useOverride) break;
+  }
+  
+  // Get heroes from override or normal formation
+  const heroesToCheck = useOverride ? overrideHeroes : c.heroes;
+  
+  for (const h of heroesToCheck) {
+    if (h.linkedTo) continue; // Skip linked heroes
+    
+    const activeHero = getSlotActiveHero(h);
+    if (activeHero) {
+      heroes.push(activeHero);
+      localUsedHeroes.add(activeHero);
+    }
+  }
+  
+  return heroes;
+}
+
+function compValid(c, hp, globalUsedHeroes = new Set()) {
+  if (!conditionsMet(c,hp)) return false;
+  
+  // Track which heroes are used in the current formation to prevent duplicates
+  // Also respect globally used heroes from other teams
+  const usedHeroes = new Set(globalUsedHeroes);
+  
+  // Helper function to get the active hero for a slot (primary or replacement)
+  const getSlotHero = (heroSlot) => {
+    // Check primary
+    const primaryHero = HEROES[heroSlot.name];
+    if (primaryHero && !missingHeroes.has(heroSlot.name) && !usedHeroes.has(heroSlot.name)) {
+      return heroSlot.name;
+    }
+    
+    // Check simple replacements
+    if (heroSlot.replacements) {
+      for (const replacement of heroSlot.replacements) {
+        const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+        const isOverride = typeof replacement === 'object' && replacement.heroesOverride;
+        
+        if (!isOverride) {
+          const replacementHero = HEROES[replacementName];
+          if (replacementHero && !missingHeroes.has(replacementName) && !usedHeroes.has(replacementName)) {
+            return replacementName;
+          }
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  // Check if any replacement has a heroesOverride that should be used
+  for (const h of c.heroes) {
+    if (h.replacements) {
+      // First check if primary is available
+      const primaryHero = HEROES[h.name];
+      const primaryAvailable = primaryHero && !missingHeroes.has(h.name) && !usedHeroes.has(h.name);
+      
+      if (!primaryAvailable) {
+        // Check if any simple replacement (non-override) is available
+        let foundSimpleReplacement = false;
+        
+        for (const replacement of h.replacements) {
+          const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+          const isOverride = typeof replacement === 'object' && replacement.heroesOverride;
+          
+          if (!isOverride) {
+            // Replacements ignore filters
+            const replacementHero = HEROES[replacementName];
+            if (replacementHero && !missingHeroes.has(replacementName) && !usedHeroes.has(replacementName)) {
+              foundSimpleReplacement = true;
+              break;
+            }
+          }
+        }
+        
+        // Only check heroesOverride if no simple replacement was found
+        if (!foundSimpleReplacement) {
+          for (const replacement of h.replacements) {
+            if (typeof replacement === 'object' && replacement.heroesOverride) {
+              // Replacements ignore filters, but must check globalUsedHeroes
+              const replacementHero = HEROES[replacement.name];
+              const replacementAvailable = replacementHero && !missingHeroes.has(replacement.name) && !usedHeroes.has(replacement.name);
+              
+              if (replacementAvailable) {
+                // Check if all heroes in the override are available (also ignore filters)
+                // But allow replacements for heroes in the override formation
+                const allOverrideAvailable = replacement.heroesOverride.every(oh => {
+                  const hero = HEROES[oh.name];
+                  const directlyAvailable = hero && !missingHeroes.has(oh.name) && !usedHeroes.has(oh.name);
+                  
+                  if (directlyAvailable) return true;
+                  
+                  // First check if the override hero itself has replacements defined
+                  if (oh.replacements) {
+                    for (const rep of oh.replacements) {
+                      const repName = typeof rep === 'string' ? rep : rep.name;
+                      const isNestedOverride = typeof rep === 'object' && rep.heroesOverride;
+                      if (!isNestedOverride) {
+                        const repHero = HEROES[repName];
+                        if (repHero && !missingHeroes.has(repName) && !usedHeroes.has(repName)) {
+                          return true; // Replacement available in override definition
+                        }
+                      }
+                    }
+                  }
+                  
+                  // Check if this hero has replacements in the original comp
+                  const originalHero = c.heroes.find(origH => origH.name === oh.name);
+                  if (originalHero && originalHero.replacements) {
+                    // Check if any simple replacement is available
+                    for (const rep of originalHero.replacements) {
+                      const repName = typeof rep === 'string' ? rep : rep.name;
+                      const isNestedOverride = typeof rep === 'object' && rep.heroesOverride;
+                      if (!isNestedOverride) {
+                        const repHero = HEROES[repName];
+                        if (repHero && !missingHeroes.has(repName) && !usedHeroes.has(repName)) {
+                          return true; // Replacement available
+                        }
+                      }
+                    }
+                  }
+                  
+                  return false;
+                });
+                
+                if (allOverrideAvailable) {
+                  // This override is valid, so the comp is valid
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Normal validation without override - track used heroes to prevent duplicates
+  for (const h of c.heroes) {
+    // Skip validation for linked heroes - they depend on their linked hero
+    if (h.linkedTo) {
+      continue;
+    }
+    
+    const slotHero = getSlotHero(h);
+    if (!slotHero) {
+      return false; // No valid hero for this slot
+    }
+    
+    usedHeroes.add(slotHero);
+  }
+  
+  return true;
+}
+
+function getMissingHeroes(c) {
+  return c.heroes.filter(h => {
+    const hero = HEROES[h.name];
+    if (!hero) return false; // Hero doesn't exist, don't show as missing
+    return missingHeroes.has(hero.name);
+  });
+}
+
+function hasOverlap(cs) {
+  const used = new Set();
+  for (const c of cs)
+    for (const h of c.heroes) {
+      if (used.has(h.name)) return true;
+      used.add(h.name);
+    }
+  return false;
+}
+
+let selectedBossType = 'endboss';
+let selectedBoss = 'endboss';
+
+// Miniboss selector - button for Verdshroom, dropdown for others
+function populateMinibossDropdown() {
+  const minibossBtn = document.getElementById('btnMiniboss');
+  const minibossDropdown = document.getElementById('minibossDropdownContainer');
+  const minibossSelector = document.getElementById('minibossSelector');
+  
+  // Verdshroom uses single button, others use dropdown
+  if (selectedMap === 'verdshroom') {
+    // Show button, hide dropdown
+    if (minibossBtn) minibossBtn.style.display = 'block';
+    if (minibossDropdown) minibossDropdown.style.display = 'none';
+  } else {
+    // Show dropdown, hide button
+    if (minibossBtn) minibossBtn.style.display = 'none';
+    if (minibossDropdown) minibossDropdown.style.display = 'flex';
+    
+    // Populate dropdown with map-specific minibosses
+    if (minibossSelector) {
+      minibossSelector.innerHTML = '<option value="">-- Select Miniboss --</option>';
+      currentMinibosses.forEach(miniboss => {
+        const option = document.createElement('option');
+        option.value = miniboss.id;
+        option.textContent = miniboss.order ? `${miniboss.name} (${miniboss.order})` : miniboss.name;
+        minibossSelector.appendChild(option);
+      });
+    }
+  }
+}
+
+async function selectMap(mapId) {
+  selectedMap = mapId;
+  // Clear existing recommendations
+  const result = document.getElementById('result');
+  if (result) result.innerHTML = '';
+  
+  // Update boss positions from selected map
+  const mapData = battleMaps.find(m => m.id === mapId);
+  currentBossPositions = mapData?.bossPositions || [];
+  currentMinibosses = mapData?.minibosses || [];
+  
+  // Update miniboss selector (button vs dropdown based on map)
+  populateMinibossDropdown();
+  
+  // Update map images
+  const battleMapImg = document.getElementById('battleMapImage');
+  const formationRefImg = document.getElementById('formationRefImage');
+  if (battleMapImg) {
+    battleMapImg.src = `comps/battle/${mapId}/map.jpg`;
+    battleMapImg.style.display = '';
+    // Render boss overlay after image loads
+    battleMapImg.onload = () => renderBossOverlay();
+  }
+  if (formationRefImg) {
+    formationRefImg.src = `comps/battle/${mapId}/empty.png`;
+  }
+  // Reload data for the new map
+  await Promise.all([loadTilePositions(), loadComps()]);
+  // Reset boss selection to default
+  selectedBossType = 'endboss';
+  selectedBoss = 'endboss';
+  
+  // Reset UI elements
+  const btnEndboss = document.getElementById('btnEndboss');
+  if (btnEndboss) {
+    btnEndboss.style.background = '#4a9eff';
+    btnEndboss.style.borderColor = '#4a9eff';
+    btnEndboss.style.color = 'white';
+  }
+  const minibossSelector = document.getElementById('minibossSelector');
+  const strongholdSelector = document.getElementById('strongholdSelector');
+  if (minibossSelector) minibossSelector.value = '';
+  if (strongholdSelector) strongholdSelector.value = '';
+  
+  // Re-render to update the formation image and teams
+  renderAll();
+}
+
+function selectBossType(type) {
+  selectedBossType = 'endboss';
+  selectedBoss = 'endboss';
+  
+  const btn = document.getElementById('btnEndboss');
+  if (btn) {
+    btn.style.background = '#4a9eff';
+    btn.style.borderColor = '#4a9eff';
+  }
+  
+  // Reset miniboss button and dropdown
+  const minibossBtn = document.getElementById('btnMiniboss');
+  const minibossSelector = document.getElementById('minibossSelector');
+  if (minibossBtn) {
+    minibossBtn.style.background = 'white';
+    minibossBtn.style.color = '#333';
+    minibossBtn.style.borderColor = '#ddd';
+  }
+  if (minibossSelector) minibossSelector.value = '';
+  
+  // Reset dropdowns
+  const strongholdSelector = document.getElementById('strongholdSelector');
+  const cleanupSelector = document.getElementById('cleanupSelector');
+  if (strongholdSelector) strongholdSelector.value = '';
+  if (cleanupSelector) cleanupSelector.value = '';
+  
+  // Auto-show recommendations
+  recommend();
+}
+
+function selectMiniboss(value) {
+  // For Verdshroom: button click with no value
+  // For other maps: dropdown selection with specific miniboss id
+  if (selectedMap === 'verdshroom') {
+    // Verdshroom: single button behavior
+    selectedBossType = 'miniboss';
+    selectedBoss = 'miniboss';
+    
+    // Style miniboss button as selected
+    const minibossBtn = document.getElementById('btnMiniboss');
+    if (minibossBtn) {
+      minibossBtn.style.background = '#4a9eff';
+      minibossBtn.style.color = 'white';
+      minibossBtn.style.borderColor = '#4a9eff';
+    }
+  } else {
+    // Other maps: dropdown behavior
+    if (!value) return;
+    
+    selectedBossType = 'miniboss';
+    selectedBoss = value;
+  }
+  
+  // Deselect endboss button
+  const endbossBtn = document.getElementById('btnEndboss');
+  if (endbossBtn) {
+    endbossBtn.style.background = 'white';
+    endbossBtn.style.color = '#333';
+    endbossBtn.style.borderColor = '#ddd';
+  }
+  
+  // Reset stronghold and cleanup dropdowns
+  const strongholdSelector = document.getElementById('strongholdSelector');
+  const cleanupSelector = document.getElementById('cleanupSelector');
+  if (strongholdSelector) strongholdSelector.value = '';
+  if (cleanupSelector) cleanupSelector.value = '';
+  
+  // Auto-show recommendations
+  recommend();
+}
+
+function selectStronghold(value) {
+  if (!value) return;
+  
+  selectedBossType = 'stronghold';
+  selectedBoss = value;
+  
+  // Deselect endboss button
+  const btn = document.getElementById('btnEndboss');
+  if (btn) {
+    btn.style.background = 'white';
+    btn.style.color = '#333';
+    btn.style.borderColor = '#ddd';
+  }
+  
+  // Reset miniboss button and dropdown
+  const minibossBtn = document.getElementById('btnMiniboss');
+  const minibossSelector = document.getElementById('minibossSelector');
+  if (minibossBtn) {
+    minibossBtn.style.background = 'white';
+    minibossBtn.style.color = '#333';
+    minibossBtn.style.borderColor = '#ddd';
+  }
+  if (minibossSelector) minibossSelector.value = '';
+  
+  // Reset cleanup dropdown
+  const cleanupSelector = document.getElementById('cleanupSelector');
+  if (cleanupSelector) cleanupSelector.value = '';
+  
+  // Auto-show recommendations
+  recommend();
+}
+
+function selectCleanup(value) {
+  if (!value) return;
+  
+  selectedBossType = 'cleanup';
+  selectedBoss = 'cleanup';
+  
+  // Deselect endboss button
+  const btn = document.getElementById('btnEndboss');
+  if (btn) {
+    btn.style.background = 'white';
+    btn.style.color = '#333';
+    btn.style.borderColor = '#ddd';
+  }
+  
+  // Reset miniboss button and dropdown
+  const minibossBtn = document.getElementById('btnMiniboss');
+  const minibossSelector = document.getElementById('minibossSelector');
+  if (minibossBtn) {
+    minibossBtn.style.background = 'white';
+    minibossBtn.style.color = '#333';
+    minibossBtn.style.borderColor = '#ddd';
+  }
+  if (minibossSelector) minibossSelector.value = '';
+  
+  // Reset stronghold dropdown
+  const strongholdSelector = document.getElementById('strongholdSelector');
+  if (strongholdSelector) strongholdSelector.value = '';
+  
+  // Auto-show recommendations
+  recommend();
+}
+
+function recommend() {
+  console.log("selectedBossType:", selectedBossType, "selectedBoss:", selectedBoss);
+  console.log("Active filters - Classes:", Array.from(activeClasses), "Factions:", Array.from(activeFactions));
+  console.log("Missing heroes:", Array.from(missingHeroes));
+  console.log("All comps:", comps);
+  console.log("Enabled comps:", comps.filter(c => c.enabled !== false).length, "/ Disabled:", comps.filter(c => c.enabled === false).length);
+  
+  // Filter comps by selected boss and enabled status
+  const allComps = comps.filter(c => {
+    // Skip disabled compositions
+    if (c.enabled === false) {
+      console.log(`Skipping disabled comp: ${c.id || c.name}`);
+      return false;
+    }
+    
+    // Check if comp matches the selected boss type and boss
+    if (c.bossType === selectedBossType && c.bossId === selectedBoss) {
+      console.log(`Including comp: ${c.id || c.name} (enabled: ${c.enabled !== false})`);
+      return true;
+    }
+    // Fallback for old format (conditions-based)
+    if (!c.bossType && c.conditions) {
+      return conditionsMet(c, 100);
+    }
+    return false;
+  });
+  
+  console.log("allComps after filter:", allComps);
+  
+  // Separate primary teams and sub-teams
+  const primaryTeams = allComps.filter(c => !c.isSubTeam);
+  const subTeams = allComps.filter(c => c.isSubTeam);
+  
+  console.log("Primary teams:", primaryTeams.map(c => c.id || c.name));
+  console.log("Sub-teams:", subTeams.map(c => c.id || c.name));
+  
+  // Track heroes used globally across all recommended teams
+  const globalUsedHeroes = new Set();
+  const recommended = [];
+  
+  // Iteratively select valid teams while tracking global hero usage
+  // Try primary teams first, then their sub-teams if primary fails
+  for (const c of primaryTeams) {
+    if (recommended.length >= 3) break;
+    
+    console.log(`\nChecking primary team ${c.id} with globalUsedHeroes:`, Array.from(globalUsedHeroes));
+    const valid = compValid(c, 100, globalUsedHeroes);
+    console.log("Primary team", c.id, "compValid:", valid);
+    
+    if (valid) {
+      // Track which heroes this comp will use
+      const compHeroes = getCompHeroes(c, globalUsedHeroes);
+      console.log(`Primary team ${c.id} will use heroes:`, compHeroes);
+      
+      compHeroes.forEach(h => globalUsedHeroes.add(h));
+      recommended.push(c);
+      console.log(`Added primary ${c.id} to recommended. GlobalUsedHeroes now:`, Array.from(globalUsedHeroes));
+    } else if (c.subTeamId) {
+      // Primary team invalid, try its sub-team
+      console.log(`Primary team ${c.id} invalid, checking for sub-team: ${c.subTeamId}`);
+      const subTeam = subTeams.find(s => (s.compID || s.id) === c.subTeamId);
+      
+      if (subTeam) {
+        console.log(`Found sub-team ${subTeam.id || subTeam.name}, checking validity...`);
+        const subValid = compValid(subTeam, 100, globalUsedHeroes);
+        console.log("Sub-team", subTeam.id, "compValid:", subValid);
+        
+        if (subValid) {
+          // Track which heroes this sub-team will use
+          const subCompHeroes = getCompHeroes(subTeam, globalUsedHeroes);
+          console.log(`Sub-team ${subTeam.id} will use heroes:`, subCompHeroes);
+          
+          subCompHeroes.forEach(h => globalUsedHeroes.add(h));
+          // Mark that this is being used as a fallback
+          subTeam.isFallbackActive = true;
+          subTeam.fallbackFor = c.name || c.id;
+          recommended.push(subTeam);
+          console.log(`Added sub-team ${subTeam.id} to recommended as fallback. GlobalUsedHeroes now:`, Array.from(globalUsedHeroes));
+        } else {
+          console.log(`Sub-team ${subTeam.id} also invalid, skipping this slot`);
+        }
+      } else {
+        console.log(`No sub-team found with ID ${c.subTeamId}`);
+      }
+    }
+  }
+  
+  console.log("Final recommended teams:", recommended.map(c => c.id));
+  console.log("Final globalUsedHeroes:", Array.from(globalUsedHeroes));
+  
+  // Build validComps for display (without global tracking for reference)
+  const validComps = allComps.filter(c => compValid(c, 100));
+
+  // Check if this is Verdshroom endboss/miniboss - need buff-separated display
+  const isVerdshroom = selectedMap === 'verdshroom';
+  const isEndbossOrMiniboss = selectedBossType === 'endboss' || selectedBossType === 'miniboss';
+  const needBuffSeparation = isVerdshroom && isEndbossOrMiniboss;
+
+  renderResult(recommended, allComps, validComps, globalUsedHeroes, needBuffSeparation);
+}
+
+/* ==========================
+   RESULT
+========================== */
+function getActiveHero(heroSlot, usedHeroes = new Set(), globalUsedHeroes = new Set()) {
+  // Try to use the primary hero
+  const primaryHero = HEROES[heroSlot.name];
+  // Special case: Allow turrets and clones to appear multiple times in the same formation
+  const canAppearMultipleTimes = heroSlot.name.includes('Turret') || heroSlot.name.includes('Clone') || heroSlot.name.includes('Tower');
+  const isUsedInThisComp = !canAppearMultipleTimes && usedHeroes.has(heroSlot.name);
+  
+  console.log(`[getActiveHero] Checking ${heroSlot.name}:`, {
+    exists: !!primaryHero,
+    notMissing: !missingHeroes.has(heroSlot.name),
+    notUsed: !isUsedInThisComp,
+    notGloballyUsed: !globalUsedHeroes.has(heroSlot.name),
+    canAppearMultipleTimes: canAppearMultipleTimes,
+    replacements: heroSlot.replacements
+  });
+  
+  if (primaryHero && !missingHeroes.has(heroSlot.name) && !isUsedInThisComp && !globalUsedHeroes.has(heroSlot.name)) {
+    console.log(`[getActiveHero] Using primary hero: ${heroSlot.name}`);
+    return { name: heroSlot.name, tileID: heroSlot.tileID };
+  }
+  
+  // Try replacements
+  if (heroSlot.replacements) {
+    console.log(`[getActiveHero] Primary hero ${heroSlot.name} unavailable, trying ${heroSlot.replacements.length} replacements...`);
+    for (const replacement of heroSlot.replacements) {
+      // Support both string format and object format
+      const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+      const replacementTileID = typeof replacement === 'object' && replacement.tileID ? replacement.tileID : heroSlot.tileID;
+      const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || replacementName.includes('Clone') || replacementName.includes('Tower');
+      const replacementIsUsedInThisComp = !replacementCanAppearMultipleTimes && usedHeroes.has(replacementName);
+      
+      const replacementHero = HEROES[replacementName];
+      console.log(`[getActiveHero] Checking replacement ${replacementName}:`, {
+        exists: !!replacementHero,
+        notMissing: !missingHeroes.has(replacementName),
+        notUsed: !replacementIsUsedInThisComp,
+        class: replacementHero?.class,
+        faction: replacementHero?.faction,
+        hasOverride: typeof replacement === 'object' && !!replacement.heroesOverride
+      });
+      
+      // Replacements ignore filters - only check if hero exists, is not missing, and not already used
+      if (replacementHero && !missingHeroes.has(replacementName) && !replacementIsUsedInThisComp && !globalUsedHeroes.has(replacementName)) {
+        // If this replacement has a heroesOverride, skip it here (handled at comp level)
+        if (typeof replacement === 'object' && replacement.heroesOverride) {
+          continue;
+        }
+        
+        console.log(`[getActiveHero] Using replacement: ${replacementName}`);
+        return { name: replacementName, tileID: replacementTileID };
+      }
+    }
+    console.log(`[getActiveHero] No valid replacements found for ${heroSlot.name}`);
+  }
+  
+  return null;
+}
+
+async function generateCompImage(comp, globalUsedHeroes = new Set()) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  console.log("Generating comp image for:", comp.name, "compID:", comp.compID);
+  console.log("Tile positions available:", tilePositions);
+  
+  // Check if any replacement has a heroesOverride that should be used
+  let heroesToDraw = comp.heroes;
+  let useOverride = false;
+  let activeOverride = null; // Track the replacement object with override
+  
+  for (const heroSlot of comp.heroes) {
+    if (useOverride) break; // Already decided to use override
+    
+    if (heroSlot.replacements) {
+      // First check if primary is available
+      const primaryHero = HEROES[heroSlot.name];
+      const primaryAvailable = primaryHero && !missingHeroes.has(heroSlot.name) && !globalUsedHeroes.has(heroSlot.name);
+      
+      if (!primaryAvailable) {
+        console.log(`Primary hero ${heroSlot.name} not available, checking replacements...`);
+        // Check if any simple replacement (non-override) is available
+        let foundSimpleReplacement = false;
+        
+        for (const replacement of heroSlot.replacements) {
+          const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+          const isOverrideReplacement = typeof replacement === 'object' && replacement.heroesOverride;
+          
+          if (!isOverrideReplacement) {
+            // Simple replacement - check if available (ignore filters for replacements)
+            const replacementHero = HEROES[replacementName];
+            if (replacementHero && !missingHeroes.has(replacementName) && !globalUsedHeroes.has(replacementName)) {
+              foundSimpleReplacement = true;
+              console.log(`✓ Found simple replacement ${replacementName} for ${heroSlot.name}, will use normal formation with replacement`);
+              break;
+            }
+          }
+        }
+        
+        // Only check heroesOverride if no simple replacement was found
+        if (!foundSimpleReplacement) {
+          console.log(`No simple replacements found for ${heroSlot.name}, checking heroesOverride...`);
+          for (const replacement of heroSlot.replacements) {
+            if (typeof replacement === 'object' && replacement.heroesOverride) {
+              // Replacements ignore filters but must check globalUsedHeroes
+              const replacementHero = HEROES[replacement.name];
+              const replacementAvailable = replacementHero && !missingHeroes.has(replacement.name) && !globalUsedHeroes.has(replacement.name);
+              
+              console.log(`Checking override ${replacement.name}: available=${replacementAvailable}, globalUsed=${globalUsedHeroes.has(replacement.name)}`);
+              
+              if (replacementAvailable) {
+                // Check if all heroes in the override are available (also ignore filters for override heroes)
+                // But allow replacements for heroes in the override
+                const missingFromOverride = [];
+                const allOverrideAvailable = replacement.heroesOverride.every(h => {
+                  const hero = HEROES[h.name];
+                  const directlyAvailable = hero && !missingHeroes.has(h.name) && !globalUsedHeroes.has(h.name);
+                  
+                  if (directlyAvailable) return true;
+                  
+                  // First check if the override hero itself has replacements defined
+                  if (h.replacements) {
+                    for (const rep of h.replacements) {
+                      const repName = typeof rep === 'string' ? rep : rep.name;
+                      const isNestedOverride = typeof rep === 'object' && rep.heroesOverride;
+                      if (!isNestedOverride) {
+                        const repHero = HEROES[repName];
+                        if (repHero && !missingHeroes.has(repName) && !globalUsedHeroes.has(repName)) {
+                          return true; // Replacement available in override definition
+                        }
+                      }
+                    }
+                  }
+                  
+                  // Check if this hero has replacements in the original comp
+                  const originalHero = comp.heroes.find(origH => origH.name === h.name);
+                  if (originalHero && originalHero.replacements) {
+                    // Check if any simple replacement is available
+                    for (const rep of originalHero.replacements) {
+                      const repName = typeof rep === 'string' ? rep : rep.name;
+                      const isNestedOverride = typeof rep === 'object' && rep.heroesOverride;
+                      if (!isNestedOverride) {
+                        const repHero = HEROES[repName];
+                        if (repHero && !missingHeroes.has(repName) && !globalUsedHeroes.has(repName)) {
+                          return true; // Replacement available
+                        }
+                      }
+                    }
+                  }
+                  
+                  missingFromOverride.push(h.name);
+                  return false;
+                });
+                
+                console.log(`Override ${replacement.name} - all heroes available: ${allOverrideAvailable}`, 
+                  missingFromOverride.length > 0 ? `Missing: ${missingFromOverride.join(', ')}` : '');
+                
+                if (allOverrideAvailable) {
+                  console.log(`✓ Using heroesOverride from replacement ${replacement.name}`);
+                  heroesToDraw = replacement.heroesOverride;
+                  useOverride = true;
+                  activeOverride = replacement; // Store the override object
+                  break;
+                } else {
+                  console.log(`✗ Cannot use override ${replacement.name} - missing heroes`);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Load the template image
+  const modeFolder = MODES[currentMode]?.folder || 'battle';
+  const template = await new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = `comps/${modeFolder}/empty.png`;
+  });
+  
+  canvas.width = template.width;
+  canvas.height = template.height;
+  
+  // Draw template
+  ctx.drawImage(template, 0, 0);
+  
+  console.log(`Drawing heroes from heroesToDraw (${heroesToDraw.length} heroes):`, heroesToDraw.map(h => h.name));
+  
+  // Track which heroes are used to prevent drawing duplicates
+  // Start with globally used heroes from other teams
+  const usedHeroes = new Set(globalUsedHeroes);
+  
+  // Load and draw each hero icon at their tile position
+  for (const heroSlot of heroesToDraw) {
+    console.log(`\n--- Processing hero slot: ${heroSlot.name} at tile ${heroSlot.tileID} ---`);
+    
+    // Check if this hero is linked to another hero
+    if (heroSlot.linkedTo) {
+      const linkedHero = heroesToDraw.find(h => h.name === heroSlot.linkedTo);
+      if (linkedHero) {
+        const linkedActiveHero = getActiveHero(linkedHero, usedHeroes, globalUsedHeroes);
+        // Only draw this hero if the linked hero is present and not replaced
+        if (!linkedActiveHero || linkedActiveHero.name !== linkedHero.name) {
+          console.log(`Skipping ${heroSlot.name} at tile ${heroSlot.tileID} because linked hero ${heroSlot.linkedTo} is missing or replaced`);
+          continue;
+        }
+      }
+    }
+    
+    // For heroesOverride, heroes may need replacements too
+    let activeHero;
+    
+    if (useOverride) {
+      // Check if hero from override needs replacement
+      const hero = HEROES[heroSlot.name];
+      // Special case: Allow turrets and clones to appear multiple times in the same formation
+      const canAppearMultipleTimes = heroSlot.name.includes('Turret') || heroSlot.name.includes('Clone') || heroSlot.name.includes('Tower');
+      const isAlreadyUsedInThisComp = !canAppearMultipleTimes && usedHeroes.has(heroSlot.name);
+      
+      if (hero && !missingHeroes.has(heroSlot.name) && !isAlreadyUsedInThisComp && !globalUsedHeroes.has(heroSlot.name)) {
+        // Hero is directly available and not used
+        activeHero = { name: heroSlot.name, tileID: heroSlot.tileID };
+      } else {
+        // Hero not available or already used - check if there's a replacement in the override or original comp
+        // First check if the override heroSlot itself has replacements
+        if (heroSlot.replacements) {
+          console.log(`Override hero ${heroSlot.name} not available, checking replacements from override definition...`);
+          for (const replacement of heroSlot.replacements) {
+            const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+            const isNestedOverride = typeof replacement === 'object' && replacement.heroesOverride;
+            
+            if (!isNestedOverride) {
+              const replacementHero = HEROES[replacementName];
+              const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || replacementName.includes('Clone') || replacementName.includes('Tower');
+              const replacementIsUsedInThisComp = !replacementCanAppearMultipleTimes && usedHeroes.has(replacementName);
+              
+              if (replacementHero && !missingHeroes.has(replacementName) && !replacementIsUsedInThisComp && !globalUsedHeroes.has(replacementName)) {
+                console.log(`Using replacement ${replacementName} for override hero ${heroSlot.name}`);
+                activeHero = { name: replacementName, tileID: heroSlot.tileID };
+                break;
+              }
+            }
+          }
+        }
+        
+        // If no replacement found in override definition, check original comp
+        if (!activeHero) {
+          const originalHero = comp.heroes.find(origH => origH.name === heroSlot.name);
+          if (originalHero && originalHero.replacements) {
+            console.log(`Override hero ${heroSlot.name} still not found, checking replacements from original comp...`);
+            // Apply replacement logic
+            for (const replacement of originalHero.replacements) {
+              const replacementName = typeof replacement === 'string' ? replacement : replacement.name;
+              const isNestedOverride = typeof replacement === 'object' && replacement.heroesOverride;
+              const replacementCanAppearMultipleTimes = replacementName.includes('Turret') || replacementName.includes('Clone') || replacementName.includes('Tower');
+              const replacementIsUsedInThisComp = !replacementCanAppearMultipleTimes && usedHeroes.has(replacementName);
+            
+              if (!isNestedOverride) {
+                const replacementHero = HEROES[replacementName];
+                if (replacementHero && !missingHeroes.has(replacementName) && !replacementIsUsedInThisComp) {
+                  console.log(`Using replacement ${replacementName} for override hero ${heroSlot.name}`);
+                  activeHero = { name: replacementName, tileID: heroSlot.tileID };
+                  break;
+                }
+              }
+            }
+          }
+        }
+        
+        if (!activeHero) {
+          console.log(`Skipping ${heroSlot.name} from override - not available and no replacement`);
+          continue;
+        }
+      }
+    } else {
+      // Normal logic with replacements
+      console.log(`Calling getActiveHero for ${heroSlot.name}...`);
+      activeHero = getActiveHero(heroSlot, usedHeroes, globalUsedHeroes);
+      console.log(`getActiveHero returned:`, activeHero);
+    }
+    
+    console.log(`Hero slot tileID ${heroSlot.tileID}: ${heroSlot.name} -> active:`, activeHero);
+    
+    if (activeHero) {
+      // Mark hero as used - for turrets/clones, track by name+tileID to allow multiple in same formation
+      const canAppearMultipleTimes = activeHero.name.includes('Turret') || activeHero.name.includes('Clone') || activeHero.name.includes('Tower');
+      const usedKey = canAppearMultipleTimes ? `${activeHero.name}@${activeHero.tileID}` : activeHero.name;
+      usedHeroes.add(usedKey);
+      console.log(`Marked ${activeHero.name} as used (key: ${usedKey}). UsedHeroes:`, Array.from(usedHeroes));
+      
+      // Use custom tileID from replacement if specified, otherwise use heroSlot tileID
+      const tileID = activeHero.tileID;
+      const tilePos = tilePositions[tileID];
+      
+      console.log(`Active hero ${activeHero.name} - tileID: ${tileID}, tilePos:`, tilePos);
+      
+      // Always lookup icon from the active hero (whether primary or replacement)
+      const hero = HEROES[activeHero.name];
+      const iconPath = hero ? hero.icon : null;
+      console.log(`Looking up icon for ${activeHero.name}:`, iconPath);
+      
+      if (tilePos && iconPath) {
+        console.log(`✓ Drawing ${activeHero.name} at tile ${tileID}:`, tilePos);
+        
+        try {
+          await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              const iconSize = tilePos.size || 128;
+              // Draw centered on the tile position
+              ctx.drawImage(img, tilePos.x - iconSize/2, tilePos.y - iconSize/2, iconSize, iconSize);
+              console.log(`✓ Successfully drew ${activeHero.name}`);
+              resolve();
+            };
+            img.onerror = (error) => {
+              console.error(`Failed to load image for ${activeHero.name} from ${iconPath}:`, error);
+              resolve(); // Resolve anyway to continue
+            };
+            img.src = iconPath;
+          });
+        } catch (error) {
+          console.error(`Error drawing ${activeHero.name}:`, error);
+        }
+      } else {
+        console.warn(`Missing tilePos or iconPath for ${activeHero.name}:`, { tilePos, iconPath });
+      }
+    } else {
+      console.warn(`No active hero for slot ${heroSlot.name} at tile ${heroSlot.tileID}`);
+    }
+    
+    console.log(`Finished processing ${heroSlot.name}, moving to next hero...\n`);
+  }
+  
+  // Draw artifact if present
+  if (comp.artifact && comp.artifact.name && comp.artifact.tileID) {
+    const artifact = ARTIFACTS[comp.artifact.name];
+    const tilePos = tilePositions[comp.artifact.tileID];
+    
+    console.log(`Drawing artifact ${comp.artifact.name} at tile ${comp.artifact.tileID}:`, tilePos);
+    
+    if (artifact && tilePos) {
+      await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const iconSize = tilePos.size || 128;
+          ctx.drawImage(img, tilePos.x - iconSize/2, tilePos.y - iconSize/2, iconSize, iconSize);
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = artifact.icon;
+      });
+    }
+  }
+  
+  // Draw phantimal if present
+  // Check if using override with phantimalOverride
+  let phantimalToDraw = comp.phantimal;
+  if (useOverride && activeOverride && activeOverride.phantimalOverride) {
+    phantimalToDraw = activeOverride.phantimalOverride;
+    console.log(`Using phantimalOverride:`, phantimalToDraw);
+  }
+  
+  if (phantimalToDraw && phantimalToDraw.name && phantimalToDraw.tileID) {
+    const tilePos = tilePositions[phantimalToDraw.tileID];
+    
+    console.log(`Drawing phantimal ${phantimalToDraw.name} at tile ${phantimalToDraw.tileID}:`, tilePos);
+    
+    if (tilePos) {
+      await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const iconSize = tilePos.size || 128;
+          ctx.drawImage(img, tilePos.x - iconSize/2, tilePos.y - iconSize/2, iconSize, iconSize);
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = `phantimals/${phantimalToDraw.name}.png`;
+      });
+    }
+  }
+  
+  return canvas.toDataURL('image/png');
+}
+
+async function exportCompsAsPNG(comps) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Generate all comp images first, tracking heroes globally
+  const compImages = [];
+  const exportUsedHeroes = new Set();
+  
+  for (const comp of comps) {
+    const dataUrl = await generateCompImage(comp, exportUsedHeroes);
+    
+    // Update used heroes for next comp
+    const compHeroes = getCompHeroes(comp, exportUsedHeroes);
+    compHeroes.forEach(h => exportUsedHeroes.add(h));
+    
+    const img = await new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.src = dataUrl;
+    });
+    compImages.push({ img, comp });
+  }
+  
+  // Calculate canvas size (arrange images horizontally with spacing and text)
+  const spacing = 20; // Horizontal space between images
+  const textHeight = 80; // Space for team name and compID below each image
+  const headerHeight = 60; // Space for boss info at top
+  const maxImageHeight = Math.max(...compImages.map(item => item.img.height));
+  const totalWidth = compImages.reduce((sum, item) => sum + item.img.width, 0) + (spacing * (compImages.length - 1));
+  const totalHeight = headerHeight + maxImageHeight + textHeight;
+  
+  canvas.width = totalWidth;
+  canvas.height = totalHeight;
+  
+  // Fill background
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw boss header
+  let bossText = 'Endboss';
+  if (selectedBossType === 'miniboss') {
+    // Convert "wedge-of-power" to "Wedge of Power"
+    const formattedName = selectedBoss.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+    bossText = `Miniboss - ${formattedName}`;
+  } else if (selectedBossType === 'stronghold') {
+    // Capitalize color: "red" to "Red"
+    const formattedColor = selectedBoss.charAt(0).toUpperCase() + selectedBoss.slice(1);
+    bossText = `Strongholds - ${formattedColor}`;
+  }
+  ctx.fillStyle = '#4a9eff';
+  ctx.font = 'bold 28px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(bossText, totalWidth / 2, 40);
+  
+  // Draw each comp image with labels (left to right)
+  let xOffset = 0;
+  for (const { img, comp } of compImages) {
+    const centerX = xOffset + img.width / 2;
+    
+    // Draw comp image
+    ctx.drawImage(img, xOffset, headerHeight);
+    
+    // Draw team name below image
+    ctx.fillStyle = '#e5e7eb';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(comp.name || 'Team', centerX, headerHeight + img.height + 25);
+    
+    // Draw compID below team name
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '16px Arial';
+    ctx.fillText(comp.compID || TRANSLATIONS[currentLang].noCompID, centerX, headerHeight + img.height + 50);
+    
+    xOffset += img.width + spacing;
+  }
+  
+  // Download the canvas as PNG
+  const link = document.createElement('a');
+  link.download = `team-comps-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function renderResult(recommended, allComps, validComps, globalUsedHeroes = new Set(), needBuffSeparation = false){
+  const result = document.getElementById('result');
+  const exportContainer = document.getElementById('exportButtonContainer');
+  if (!result) return;
+  
+  result.innerHTML="";
+  if (exportContainer) exportContainer.innerHTML = "";
+  
+  // Show recommended teams if available (limit to 5)
+  if(recommended.length > 0){
+    
+    // Check if we need buff-separated display (Verdshroom endboss/miniboss)
+    if (needBuffSeparation) {
+      // Separate teams by buff type - ALL teams should be tagged with buffs
+      const unrivaledTeams = allComps.filter(c => 
+        c.buffs && c.buffs.includes('unrivaled-might')
+      );
+      const hallTeams = allComps.filter(c => 
+        c.buffs && c.buffs.includes('hall-of-legends')
+      );
+      
+      // Separate into primary and sub-teams for each buff
+      const unrivaledPrimary = unrivaledTeams.filter(c => !c.isSubTeam);
+      const unrivaledSubs = unrivaledTeams.filter(c => c.isSubTeam);
+      const hallPrimary = hallTeams.filter(c => !c.isSubTeam);
+      const hallSubs = hallTeams.filter(c => c.isSubTeam);
+      
+      // Find recommended teams for each buff
+      const unrivaledRecommended = [];
+      const hallRecommended = [];
+      const unrivaledUsedHeroes = new Set();
+      const hallUsedHeroes = new Set();
+      
+      // Process Unrivaled Might teams (primary + sub fallback)
+      for (const c of unrivaledPrimary) {
+        if (unrivaledRecommended.length >= 3) break;
+        if (compValid(c, 100, unrivaledUsedHeroes)) {
+          const compHeroes = getCompHeroes(c, unrivaledUsedHeroes);
+          compHeroes.forEach(h => unrivaledUsedHeroes.add(h));
+          unrivaledRecommended.push(c);
+        } else if (c.subTeamId) {
+          // Try sub-team
+          const subTeam = unrivaledSubs.find(s => (s.compID || s.id) === c.subTeamId);
+          if (subTeam && compValid(subTeam, 100, unrivaledUsedHeroes)) {
+            const subCompHeroes = getCompHeroes(subTeam, unrivaledUsedHeroes);
+            subCompHeroes.forEach(h => unrivaledUsedHeroes.add(h));
+            subTeam.isFallbackActive = true;
+            subTeam.fallbackFor = c.name || c.id;
+            unrivaledRecommended.push(subTeam);
+          }
+        }
+      }
+      
+      // Process Hall of Legends teams (primary + sub fallback)
+      for (const c of hallPrimary) {
+        if (hallRecommended.length >= 3) break;
+        if (compValid(c, 100, hallUsedHeroes)) {
+          const compHeroes = getCompHeroes(c, hallUsedHeroes);
+          compHeroes.forEach(h => hallUsedHeroes.add(h));
+          hallRecommended.push(c);
+        } else if (c.subTeamId) {
+          // Try sub-team
+          const subTeam = hallSubs.find(s => (s.compID || s.id) === c.subTeamId);
+          if (subTeam && compValid(subTeam, 100, hallUsedHeroes)) {
+            const subCompHeroes = getCompHeroes(subTeam, hallUsedHeroes);
+            subCompHeroes.forEach(h => hallUsedHeroes.add(h));
+            subTeam.isFallbackActive = true;
+            subTeam.fallbackFor = c.name || c.id;
+            hallRecommended.push(subTeam);
+          }
+        }
+      }
+      for (const c of hallTeams) {
+        if (hallRecommended.length >= 3) break;
+        if (compValid(c, 100, hallUsedHeroes)) {
+          const compHeroes = getCompHeroes(c, hallUsedHeroes);
+          compHeroes.forEach(h => hallUsedHeroes.add(h));
+          hallRecommended.push(c);
+        }
+      }
+      
+      // Create two sections - ALWAYS show both even if empty
+      const buffSectionsContainer = document.createElement('div');
+      buffSectionsContainer.style.display = 'flex';
+      buffSectionsContainer.style.flexDirection = 'column';
+      buffSectionsContainer.style.gap = '30px';
+      buffSectionsContainer.style.width = '100%';
+      
+      // Unrivaled Might Section - ALWAYS SHOW
+      const unrivaledSection = document.createElement('div');
+      unrivaledSection.style.width = '100%';
+      
+      const unrivaledHeader = document.createElement('div');
+      unrivaledHeader.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+      unrivaledHeader.style.padding = '15px 20px';
+      unrivaledHeader.style.borderRadius = '8px';
+      unrivaledHeader.style.marginBottom = '15px';
+      unrivaledHeader.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+      unrivaledHeader.innerHTML = `
+        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 4px;">⚔️ Unrivaled Might</div>
+        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px;">60% damage boost to one carry</div>
+      `;
+      unrivaledSection.appendChild(unrivaledHeader);
+      
+      const unrivaledTeamsContainer = document.createElement('div');
+      unrivaledTeamsContainer.style.display = 'flex';
+      unrivaledTeamsContainer.style.gap = '15px';
+      unrivaledTeamsContainer.style.overflowX = 'auto';
+      unrivaledTeamsContainer.style.paddingBottom = '10px';
+      
+      if (unrivaledRecommended.length > 0) {
+        await renderTeams(unrivaledRecommended.slice(0, 5), unrivaledTeamsContainer, false);
+      } else {
+        // Show empty state message
+        const emptyMsg = document.createElement('div');
+        emptyMsg.style.padding = '30px';
+        emptyMsg.style.textAlign = 'center';
+        emptyMsg.style.color = '#94a3b8';
+        emptyMsg.style.background = '#1e293b';
+        emptyMsg.style.borderRadius = '8px';
+        emptyMsg.style.width = '100%';
+        emptyMsg.innerHTML = `
+          <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">No Available Teams</div>
+          <div style="font-size: 13px;">No teams configured for this buff, or heroes currently unavailable</div>
+        `;
+        unrivaledTeamsContainer.appendChild(emptyMsg);
+      }
+      
+      unrivaledSection.appendChild(unrivaledTeamsContainer);
+      buffSectionsContainer.appendChild(unrivaledSection);
+      
+      // Hall of Legends Section - ALWAYS SHOW
+      const hallSection = document.createElement('div');
+      hallSection.style.width = '100%';
+      
+      const hallHeader = document.createElement('div');
+      hallHeader.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+      hallHeader.style.padding = '15px 20px';
+      hallHeader.style.borderRadius = '8px';
+      hallHeader.style.marginBottom = '15px';
+      hallHeader.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
+      hallHeader.innerHTML = `
+        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 4px;">🏛️ Hall of Legends</div>
+        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px;">40% damage boost to three carries</div>
+      `;
+      hallSection.appendChild(hallHeader);
+      
+      const hallTeamsContainer = document.createElement('div');
+      hallTeamsContainer.style.display = 'flex';
+      hallTeamsContainer.style.gap = '15px';
+      hallTeamsContainer.style.overflowX = 'auto';
+      hallTeamsContainer.style.paddingBottom = '10px';
+      
+      if (hallRecommended.length > 0) {
+        await renderTeams(hallRecommended.slice(0, 5), hallTeamsContainer, false);
+      } else {
+        // Show empty state message
+        const emptyMsg = document.createElement('div');
+        emptyMsg.style.padding = '30px';
+        emptyMsg.style.textAlign = 'center';
+        emptyMsg.style.color = '#94a3b8';
+        emptyMsg.style.background = '#1e293b';
+        emptyMsg.style.borderRadius = '8px';
+        emptyMsg.style.width = '100%';
+        emptyMsg.innerHTML = `
+          <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">No Available Teams</div>
+          <div style="font-size: 13px;">No teams configured for this buff, or heroes currently unavailable</div>
+        `;
+        hallTeamsContainer.appendChild(emptyMsg);
+      }
+      
+      hallSection.appendChild(hallTeamsContainer);
+      buffSectionsContainer.appendChild(hallSection);
+      
+      result.appendChild(buffSectionsContainer);
+      
+      // Combine both buff teams for export
+      const allRecommendedTeams = [...unrivaledRecommended, ...hallRecommended];
+      
+      // Add export button for all teams
+      if (exportContainer && allRecommendedTeams.length > 0) {
+        const exportBtn = document.createElement("button");
+        exportBtn.textContent = TRANSLATIONS[currentLang].exportBtn;
+        exportBtn.style.width = "100%";
+        exportBtn.style.padding = "10px 20px";
+        exportBtn.style.background = "#4a9eff";
+        exportBtn.style.color = "white";
+        exportBtn.style.border = "none";
+        exportBtn.style.borderRadius = "4px";
+        exportBtn.style.cursor = "pointer";
+        exportBtn.style.fontWeight = "bold";
+        exportBtn.onclick = () => exportCompsAsPNG(allRecommendedTeams);
+        exportContainer.appendChild(exportBtn);
+      }
+      
+    } else {
+      // Normal display without buff separation
+      await renderTeams(recommended.slice(0, 5), result, true);
+      
+      // Add export button
+      if (exportContainer) {
+        const exportBtn = document.createElement("button");
+        exportBtn.textContent = TRANSLATIONS[currentLang].exportBtn;
+        exportBtn.style.width = "100%";
+        exportBtn.style.padding = "10px 20px";
+        exportBtn.style.background = "#4a9eff";
+        exportBtn.style.color = "white";
+        exportBtn.style.border = "none";
+        exportBtn.style.borderRadius = "4px";
+        exportBtn.style.cursor = "pointer";
+        exportBtn.style.fontWeight = "bold";
+        exportBtn.onclick = () => exportCompsAsPNG(recommended.slice(0, 5));
+        exportContainer.appendChild(exportBtn);
+      }
+    }
+  } else {
+    const msg = document.createElement("div");
+    msg.className = "error";
+    msg.style.flex = "1";
+    msg.innerHTML = TRANSLATIONS[currentLang].noValidTeams;
+    result.appendChild(msg);
+  }
+}
+
+// Helper function to render teams into a container
+async function renderTeams(teams, container, showExportBtn = false) {
+  const renderUsedHeroes = new Set();
+  
+  for (let i = 0; i < teams.length; i++) {
+    const c = teams[i];
+    const d = document.createElement("div");
+    d.className = "team";
+    d.style.flex = "0 0 260px";
+    d.style.width = "260px";
+    d.style.textAlign = "center";
+    
+    // Add team number header
+    const teamHeader = document.createElement("h4");
+    teamHeader.textContent = `${TRANSLATIONS[currentLang].team} ${i + 1}`;
+    teamHeader.style.margin = "0 0 10px 0";
+    teamHeader.style.color = "#e5e7eb";
+    teamHeader.style.fontSize = "14px";
+    teamHeader.style.fontWeight = "bold";
+    d.appendChild(teamHeader);
+    
+    // Add fallback indicator if this is a sub-team being used
+    if (c.isFallbackActive) {
+      const fallbackBadge = document.createElement("div");
+      fallbackBadge.style.display = "inline-block";
+      fallbackBadge.style.padding = "4px 12px";
+      fallbackBadge.style.background = "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)";
+      fallbackBadge.style.borderRadius = "6px";
+      fallbackBadge.style.color = "white";
+      fallbackBadge.style.fontSize = "11px";
+      fallbackBadge.style.fontWeight = "bold";
+      fallbackBadge.style.marginBottom = "8px";
+      fallbackBadge.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
+      fallbackBadge.textContent = `⚠️ Fallback Team (for: ${c.fallbackFor})`;
+      fallbackBadge.title = "This team is shown because the primary team couldn't be formed";
+      d.appendChild(fallbackBadge);
+    }
+    
+    // Generate dynamic comp image using template + hero icons
+    const compImageUrl = await generateCompImage(c, renderUsedHeroes);
+    
+    // Update used heroes for next team
+    const compHeroes = getCompHeroes(c, renderUsedHeroes);
+    compHeroes.forEach(h => renderUsedHeroes.add(h));
+    
+    const img = document.createElement("img");
+    img.src = compImageUrl;
+    img.style.width = "100%";
+    img.style.height = "auto";
+    img.style.borderRadius = "8px";
+    img.style.marginBottom = "10px";
+    
+    const compIDDiv = document.createElement("div");
+    compIDDiv.style.marginTop = "10px";
+    compIDDiv.style.padding = "10px";
+    compIDDiv.style.background = "#1e293b";
+    compIDDiv.style.borderRadius = "6px";
+    compIDDiv.style.color = "#e5e7eb";
+    compIDDiv.style.cursor = "pointer";
+    compIDDiv.style.userSelect = "all";
+    compIDDiv.textContent = c.compID || TRANSLATIONS[currentLang].noCompID;
+    compIDDiv.title = "Click to copy";
+    compIDDiv.onclick = function() {
+      navigator.clipboard.writeText(c.compID || '');
+      this.style.background = '#2563eb';
+      setTimeout(() => this.style.background = '#1e293b', 200);
+    };
+    
+    d.appendChild(img);
+    d.appendChild(compIDDiv);
+    
+    // Add hint if available (with translation support)
+    const hintText = c.hint;
+    if (hintText) {
+      const hintDiv = document.createElement("div");
+      hintDiv.style.marginTop = "8px";
+      hintDiv.style.marginBottom = "0";
+      hintDiv.style.padding = "8px 10px";
+      hintDiv.style.background = "#0f172a";
+      hintDiv.style.borderRadius = "6px";
+      hintDiv.style.color = "#94a3b8";
+      hintDiv.style.fontSize = "12px";
+      hintDiv.style.fontStyle = "italic";
+      hintDiv.style.lineHeight = "1.4";
+      hintDiv.style.textAlign = "left";
+      
+      // Map hint text to translation key
+      const hintMapping = {
+        "Best Team": "team1Hint",
+        "Better when Boss HP < 50%": "team2Hint",
+        "Better when Boss HP > 50%": "team3Hint"
+      };
+      
+      const translationKey = hintMapping[hintText];
+      if (translationKey && TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][translationKey]) {
+        hintDiv.textContent = TRANSLATIONS[currentLang][translationKey];
+      } else {
+        hintDiv.textContent = hintText; // Fallback to original text
+      }
+      
+      d.appendChild(hintDiv);
+    }
+    
+    container.appendChild(d);
+  }
+}
+
+async function renderResult_OLD(recommended, allComps, validComps, globalUsedHeroes = new Set()){
+  const result = document.getElementById('result');
+  const exportContainer = document.getElementById('exportButtonContainer');
+  if (!result) return;
+  
+  result.innerHTML="";
+  if (exportContainer) exportContainer.innerHTML = "";
+  
+  // Show recommended teams if available (limit to 5)
+  if(recommended.length > 0){
+    // Track heroes used as we render each team
+    const renderUsedHeroes = new Set();
+    const maxTeams = Math.min(recommended.length, 5);
+    
+    for (let i = 0; i < maxTeams; i++) {
+      const c = recommended[i];
+      const d = document.createElement("div");
+      d.className = "team";
+      d.style.flex = "0 0 260px";
+      d.style.width = "260px";
+      d.style.textAlign = "center";
+      
+      // Add team number header
+      const teamHeader = document.createElement("h4");
+      teamHeader.textContent = `${TRANSLATIONS[currentLang].team} ${i + 1}`;
+      teamHeader.style.margin = "0 0 10px 0";
+      teamHeader.style.color = "#e5e7eb";
+      teamHeader.style.fontSize = "14px";
+      teamHeader.style.fontWeight = "bold";
+      d.appendChild(teamHeader);
+      
+      // Generate dynamic comp image using template + hero icons
+      const compImageUrl = await generateCompImage(c, renderUsedHeroes);
+      
+      // Update used heroes for next team
+      const compHeroes = getCompHeroes(c, renderUsedHeroes);
+      compHeroes.forEach(h => renderUsedHeroes.add(h));
+      
+      const img = document.createElement("img");
+      img.src = compImageUrl;
+      img.style.width = "100%";
+      img.style.height = "auto";
+      img.style.borderRadius = "8px";
+      img.style.marginBottom = "10px";
+      
+      const compIDDiv = document.createElement("div");
+      compIDDiv.style.marginTop = "10px";
+      compIDDiv.style.padding = "10px";
+      compIDDiv.style.background = "#1e293b";
+      compIDDiv.style.borderRadius = "6px";
+      compIDDiv.style.color = "#e5e7eb";
+      compIDDiv.style.cursor = "pointer";
+      compIDDiv.style.userSelect = "all";
+      compIDDiv.textContent = c.compID || TRANSLATIONS[currentLang].noCompID;
+      compIDDiv.title = "Click to copy";
+      compIDDiv.onclick = function() {
+        navigator.clipboard.writeText(c.compID || '');
+        this.style.background = '#2563eb';
+        setTimeout(() => this.style.background = '#1e293b', 200);
+      };
+      
+      d.appendChild(img);
+      d.appendChild(compIDDiv);
+      
+      // Add hint if available (with translation support)
+      const hintText = c.hint;
+      if (hintText) {
+        const hintDiv = document.createElement("div");
+        hintDiv.style.marginTop = "8px";
+        hintDiv.style.marginBottom = "0";
+        hintDiv.style.padding = "8px 10px";
+        hintDiv.style.background = "#0f172a";
+        hintDiv.style.borderRadius = "6px";
+        hintDiv.style.color = "#94a3b8";
+        hintDiv.style.fontSize = "12px";
+        hintDiv.style.fontStyle = "italic";
+        hintDiv.style.lineHeight = "1.4";
+        hintDiv.style.textAlign = "left";
+        
+        // Map hint text to translation key
+        const hintMapping = {
+          "Best Team": "team1Hint",
+          "Better when Boss HP < 50%": "team2Hint",
+          "Better when Boss HP > 50%": "team3Hint"
+        };
+        
+        const translationKey = hintMapping[hintText];
+        if (translationKey && TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][translationKey]) {
+          hintDiv.textContent = TRANSLATIONS[currentLang][translationKey];
+        } else {
+          hintDiv.textContent = hintText; // Fallback to original text
+        }
+        
+        d.appendChild(hintDiv);
+      }
+      
+      result.appendChild(d);
+    }
+    
+    // Add export button in separate container below all teams
+    if (exportContainer) {
+      const exportBtn = document.createElement("button");
+      exportBtn.textContent = TRANSLATIONS[currentLang].exportBtn;
+      exportBtn.style.width = "100%";
+      exportBtn.style.padding = "10px 20px";
+      exportBtn.style.background = "#4a9eff";
+      exportBtn.style.color = "white";
+      exportBtn.style.border = "none";
+      exportBtn.style.borderRadius = "4px";
+      exportBtn.style.cursor = "pointer";
+      exportBtn.style.fontWeight = "bold";
+      exportBtn.onclick = () => exportCompsAsPNG(recommended.slice(0, maxTeams));
+      exportContainer.appendChild(exportBtn);
+    }
+  } else {
+    const msg = document.createElement("div");
+    msg.className = "error";
+    msg.style.flex = "1";
+    msg.innerHTML = TRANSLATIONS[currentLang].noValidTeams;
+    result.appendChild(msg);
+  }
+}
+
+/* ==========================
+   INITIAL RENDER
+========================== */
+function renderAll(){
+  renderIconRow("classFilters",CLASSES,activeClasses);
+  renderIconRow("factionFilters",FACTIONS,activeFactions);
+  renderHeroes();
+  
+  // Auto-refresh recommendations if they were already shown
+  const result = document.getElementById('result');
+  if (result && result.innerHTML.trim() !== '') {
+    recommend();
+  }
+}
+</script>
+</body>
+</html>

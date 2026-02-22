@@ -1,0 +1,39 @@
+# Python Virtual Environment
+.venv/
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Backup Folders
+backup_*/
+RESTORE_INSTRUCTIONS.txt
+
+# Admin Files (keep local only, don't deploy)
+admin-api.py
+admin-enhanced.html
+requirements.txt
+ADMIN_*.md
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary Files
+*.tmp
+~*
