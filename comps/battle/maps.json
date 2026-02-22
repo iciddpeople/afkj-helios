@@ -1,36 +1,6 @@
 {
-  "_comment": "To add a new map: 1) Create folder under comps/battle/{map-id}/, 2) Add map.jpg (battle map image), empty.png (formation template), comps.json, and tiles.json, 3) Add map entry below with 'isCurrent: true' to make it default",
+  "_comment": "To add a new map: 1) Create folder under comps/battle/{map-id}/, 2) Add map.jpg (battle map image), empty.png (formation template), comps.json, and tiles.json, 3) Add map entry below with 'isCurrent: true' to make it default. DESOLATE-GROUNDS TEMPORARILY DISABLED.",
   "maps": [
-    {
-      "id": "desolate-grounds",
-      "name": "Desolate Grounds",
-      "isCurrent": false,
-      "season": 1,
-      "description": "A barren wasteland filled with dangerous enemies",
-      "minibosses": [
-        { "id": "wedge-of-matter", "name": "Wedge of Matter", "order": 16 },
-        { "id": "wedge-of-power", "name": "Wedge of Power", "order": 15 }
-      ],
-      "bossPositions": [
-        { "type": "stronghold", "color": "red", "order": 1, "x": 828, "y": 652 },
-        { "type": "stronghold", "color": "green", "order": 2, "x": 973, "y": 886 },
-        { "type": "stronghold", "color": "red", "order": 3, "x": 790, "y": 1052 },
-        { "type": "stronghold", "color": "blue", "order": 4, "x": 594, "y": 1099 },
-        { "type": "stronghold", "color": "green", "order": 5, "x": 395, "y": 1062 },
-        { "type": "stronghold", "color": "red", "order": 6, "x": 208, "y": 881 },
-        { "type": "stronghold", "color": "green", "order": 7, "x": 375, "y": 653 },
-        { "type": "stronghold", "color": "blue", "order": 8, "x": 968, "y": 426 },
-        { "type": "stronghold", "color": "blue", "order": 9, "x": 796, "y": 271 },
-        { "type": "stronghold", "color": "red", "order": 10, "x": 602, "y": 231 },
-        { "type": "stronghold", "color": "green", "order": 11, "x": 403, "y": 269 },
-        { "type": "stronghold", "color": "red", "order": 12, "x": 220, "y": 430 },
-        { "type": "stronghold", "color": "blue", "order": 13, "x": 490, "y": 860 },
-        { "type": "stronghold", "color": "green", "order": 14, "x": 702, "y": 430 },
-        { "type": "miniboss", "id": "Wedge of Power (15)", "order": 15, "x": 755, "y": 853 },
-        { "type": "miniboss", "id": "Wedge of Matter (16)", "order": 16, "x": 443, "y": 418 },
-        { "type": "endboss", "order": 17, "x": 598, "y": 598 }
-      ]
-    },
     {
       "id": "verdshroom",
       "name": "Verdshroom",
