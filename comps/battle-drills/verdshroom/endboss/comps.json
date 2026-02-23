@@ -10,6 +10,61 @@
       "buffs": [
         "unrivaled-might"
       ],
+      "compID": "SUB2_UNRIVALED_BOSS1",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Lailah",
+          "tileID": 1
+        },
+        {
+          "name": "Shemira",
+          "tileID": 4
+        },
+        {
+          "name": "Kulu",
+          "replacements": [
+            "Aliceth",
+            "Mehira"
+          ],
+          "tileID": 5
+        },
+        {
+          "name": "Elijah",
+          "tileID": 7
+        },
+        {
+          "name": "Reinier",
+          "tileID": 9
+        },
+        {
+          "name": "Nazrik",
+          "replacements": [
+            "Odie"
+          ],
+          "tileID": 10
+        }
+      ],
+      "hint": "Best in Slot",
+      "imageData": null,
+      "isSubTeam": true,
+      "name": "sub2_unrivaled_boss1",
+      "phantimal": {
+        "name": "Skyclops",
+        "tileID": "2"
+      },
+      "order": 0
+    },
+    {
+      "artifact": {
+        "name": "Arcanewild",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "buffs": [
+        "unrivaled-might"
+      ],
       "compID": "SUB1_UNRIVALED_BOSS1",
       "enabled": true,
       "heroes": [
@@ -51,7 +106,7 @@
         "name": "Skyclops",
         "tileID": 2
       },
-      "subTeamId": "SUB2_UNRIVALED_BOSS3"
+      "subTeamId": "SUB2_UNRIVALED_BOSS1"
     },
     {
       "artifact": {
@@ -172,10 +227,6 @@
         },
         {
           "name": "Kulu",
-          "replacements": [
-            "Aliceth",
-            "Mehira"
-          ],
           "tileID": 5
         },
         {
@@ -188,9 +239,6 @@
         },
         {
           "name": "Nazrik",
-          "replacements": [
-            "Odie"
-          ],
           "tileID": 10
         }
       ],
@@ -361,10 +409,10 @@
         },
         {
           "name": "Shadewing",
-          "tileID": 6,
           "replacements": [
             "Faramor"
-          ]
+          ],
+          "tileID": 6
         },
         {
           "name": "Kordan",
