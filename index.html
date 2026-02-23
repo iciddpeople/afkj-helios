@@ -494,6 +494,24 @@ button:active { background: #0284c7; }
     min-width: 140px;
     width: auto !important;
   }
+
+  /* Hero section & formation ref collapse with toggle */
+  .mobile-hero-section.collapsed,
+  #formationRefContainer.collapsed {
+    display: none;
+  }
+
+  /* Hero section border separator removed when collapsed */
+  #formationAndTeamsContainer.formation-teams-container {
+    flex-direction: column;
+  }
+
+  #formationRefContainer {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+  }
 }
 
 /* ===================================================
@@ -595,7 +613,7 @@ const MODES = {
       return `
       <div class="main-section">
         <div class="left-panel">
-          <button class="filters-toggle-btn" onclick="toggleFilters()">⚙️ Controls &amp; Filters</button>
+          <button class="filters-toggle-btn" onclick="toggleFilters()">⚙️ Setup &amp; Heroes</button>
           <div class="left-panel-content" id="leftPanelContent">
           <h2 data-i18n="battleMap">Battle Map</h2>
           <div style="margin-bottom: 20px;">
@@ -654,8 +672,10 @@ const MODES = {
           </div><!-- /.left-panel-content -->
         </div>
         <div class="right-panel">
-          <h2 data-i18n="heroes">Heroes (click to disable)</h2>
-          <div id="heroGrid" class="hero-grid"></div>
+          <div class="mobile-hero-section" id="heroSection">
+            <h2 data-i18n="heroes">Heroes (click to disable)</h2>
+            <div id="heroGrid" class="hero-grid"></div>
+          </div>
           <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #4a9eff;">
             <div id="formationAndTeamsContainer" class="formation-teams-container">
               <div id="formationRefContainer" class="formation-ref-container">
@@ -3204,6 +3224,11 @@ function toggleFilters() {
   if (!btn || !content) return;
   btn.classList.toggle('collapsed');
   content.classList.toggle('collapsed');
+  // Also toggle hero grid and formation reference
+  const heroSection = document.getElementById('heroSection');
+  const formationRef = document.getElementById('formationRefContainer');
+  if (heroSection) heroSection.classList.toggle('collapsed');
+  if (formationRef) formationRef.classList.toggle('collapsed');
 }
 
 /* ==========================
