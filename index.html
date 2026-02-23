@@ -163,7 +163,7 @@ button:active { background: #0284c7; }
 #result {
   display: flex;
   flex-direction: row;
-  gap: 6px;
+  gap: 16px;
   width: 100%;
   padding-top: 20px;
   justify-content: center;
@@ -354,6 +354,162 @@ button:active { background: #0284c7; }
     gap: 8px;
   }
 }
+
+/* ===================================================
+   MAIN SECTION & RESPONSIVE LAYOUT CLASSES
+=================================================== */
+.main-section {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.formation-teams-container {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.formation-ref-container {
+  flex: 0 0 260px;
+  width: 260px;
+}
+
+.teams-scroll-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  flex-wrap: nowrap;
+}
+
+.team-card {
+  flex: 0 0 260px;
+  width: 260px;
+  text-align: center;
+}
+
+/* ===================================================
+   MOBILE FILTERS TOGGLE BUTTON
+=================================================== */
+.filters-toggle-btn {
+  display: none;
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 10px;
+  position: relative;
+  min-height: 48px;
+  touch-action: manipulation;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.2s;
+}
+.filters-toggle-btn:active {
+  background: #1e3a5f;
+}
+.filters-toggle-btn::after {
+  content: '\25BC';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.25s ease;
+  font-size: 11px;
+  color: #38bdf8;
+}
+.filters-toggle-btn.collapsed::after {
+  transform: translateY(-50%) rotate(-90deg);
+}
+.left-panel-content.collapsed {
+  display: none;
+}
+
+/* ===================================================
+   MOBILE RESPONSIVE — Tablets & Phones (≤768px)
+=================================================== */
+@media (max-width: 768px) {
+  .main-section {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .filters-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .left-panel {
+    border-right: none !important;
+    border-bottom: 1px solid #334155;
+    padding-right: 0 !important;
+    padding-bottom: 12px;
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .right-panel {
+    padding-left: 0 !important;
+    padding-top: 16px;
+  }
+
+  .formation-teams-container {
+    flex-direction: column;
+    overflow-x: visible;
+    gap: 12px;
+  }
+
+  .formation-ref-container {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  #result {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    gap: 12px !important;
+  }
+
+  .teams-scroll-container {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: 12px;
+  }
+
+  .team-card {
+    flex: 1 1 calc(50% - 8px) !important;
+    min-width: 140px;
+    width: auto !important;
+  }
+}
+
+/* ===================================================
+   MOBILE RESPONSIVE — Small Phones (≤480px)
+=================================================== */
+@media (max-width: 480px) {
+  .team-card {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+
+  .hero-grid img {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
 </style>
 </head>
 
@@ -437,8 +593,10 @@ const MODES = {
       ).join('');
       
       return `
-      <div class="main-section" style="display:flex;flex-direction:row;gap:24px;width:100%;align-items:flex-start;">
+      <div class="main-section">
         <div class="left-panel">
+          <button class="filters-toggle-btn" onclick="toggleFilters()">⚙️ Controls &amp; Filters</button>
+          <div class="left-panel-content" id="leftPanelContent">
           <h2 data-i18n="battleMap">Battle Map</h2>
           <div style="margin-bottom: 20px;">
             <select id="mapSelector" onchange="selectMap(this.value)" style="padding: 10px; width: 100%; background: #1e293b; color: white; border: 2px solid #38bdf8; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation;">
@@ -493,17 +651,18 @@ const MODES = {
               <svg id="battleMapOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></svg>
             </div>
           </div>
+          </div><!-- /.left-panel-content -->
         </div>
         <div class="right-panel">
           <h2 data-i18n="heroes">Heroes (click to disable)</h2>
           <div id="heroGrid" class="hero-grid"></div>
           <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #4a9eff;">
-            <div id="formationAndTeamsContainer" style="display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; padding-bottom: 10px;">
-              <div id="formationRefContainer" style="flex: 0 0 260px; width: 260px;">
+            <div id="formationAndTeamsContainer" class="formation-teams-container">
+              <div id="formationRefContainer" class="formation-ref-container">
                 <h3 style="margin-bottom: 10px; color: #e5e7eb; text-align: center; font-size: 14px;" data-i18n="formationRef">Formation Reference</h3>
                 <img id="formationRefImage" src="comps/battle/${selectedMap}/empty.png" alt="Formation Template" style="width: 100%; height: auto; border-radius: 8px; border: 2px solid #4a9eff;">
               </div>
-              <div id="result" style="display: flex; gap: 16px; flex-wrap: nowrap;"></div>
+              <div id="result"></div>
             </div>
             <div id="exportButtonContainer" style="margin-top: 20px;"></div>
           </div>
@@ -2711,10 +2870,7 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
       unrivaledSection.appendChild(unrivaledHeader);
       
       const unrivaledTeamsContainer = document.createElement('div');
-      unrivaledTeamsContainer.style.display = 'flex';
-      unrivaledTeamsContainer.style.gap = '15px';
-      unrivaledTeamsContainer.style.overflowX = 'auto';
-      unrivaledTeamsContainer.style.paddingBottom = '10px';
+      unrivaledTeamsContainer.className = 'teams-scroll-container';
       
       if (unrivaledRecommended.length > 0) {
         await renderTeams(unrivaledRecommended.slice(0, 5), unrivaledTeamsContainer, false);
@@ -2755,10 +2911,7 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
       hallSection.appendChild(hallHeader);
       
       const hallTeamsContainer = document.createElement('div');
-      hallTeamsContainer.style.display = 'flex';
-      hallTeamsContainer.style.gap = '15px';
-      hallTeamsContainer.style.overflowX = 'auto';
-      hallTeamsContainer.style.paddingBottom = '10px';
+      hallTeamsContainer.className = 'teams-scroll-container';
       
       if (hallRecommended.length > 0) {
         await renderTeams(hallRecommended.slice(0, 5), hallTeamsContainer, false);
@@ -2839,10 +2992,7 @@ async function renderTeams(teams, container, showExportBtn = false) {
   for (let i = 0; i < teams.length; i++) {
     const c = teams[i];
     const d = document.createElement("div");
-    d.className = "team";
-    d.style.flex = "0 0 260px";
-    d.style.width = "260px";
-    d.style.textAlign = "center";
+    d.className = "team team-card";
     
     // Add team number header
     const teamHeader = document.createElement("h4");
@@ -3043,6 +3193,17 @@ async function renderResult_OLD(recommended, allComps, validComps, globalUsedHer
     msg.innerHTML = TRANSLATIONS[currentLang].noValidTeams;
     result.appendChild(msg);
   }
+}
+
+/* ==========================
+   MOBILE TOGGLE
+========================== */
+function toggleFilters() {
+  const btn = document.querySelector('.filters-toggle-btn');
+  const content = document.getElementById('leftPanelContent');
+  if (!btn || !content) return;
+  btn.classList.toggle('collapsed');
+  content.classList.toggle('collapsed');
 }
 
 /* ==========================
