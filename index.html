@@ -2601,7 +2601,7 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
   return canvas.toDataURL('image/png');
 }
 
-async function exportCompsAsPNG(comps) {
+async function exportCompsAsPNG(comps, groups = null) {
   // Find the export button and show loading state
   const exportBtn = document.querySelector('#exportButtonContainer button');
   const originalText = exportBtn ? exportBtn.textContent : '';
@@ -2614,24 +2614,42 @@ async function exportCompsAsPNG(comps) {
   try {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  
-  // Generate all comp images first, tracking heroes globally
-  const compImages = [];
-  const exportUsedHeroes = new Set();
-  
-  for (const comp of comps) {
-    const dataUrl = await generateCompImage(comp, exportUsedHeroes);
-    
-    // Update used heroes for next comp
-    const compHeroes = getCompHeroes(comp, exportUsedHeroes);
-    compHeroes.forEach(h => exportUsedHeroes.add(h));
-    
-    const img = await new Promise((resolve) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.src = dataUrl;
-    });
-    compImages.push({ img, comp });
+
+  // If groups are provided, process each group with its own hero tracking set
+  // so heroes used in one buff group don't block the other buff group.
+  let compImages = [];
+
+  if (groups && groups.length > 0) {
+    for (const group of groups) {
+      const groupUsedHeroes = new Set(); // independent per group
+      const groupImages = [];
+      for (const comp of group.teams) {
+        const dataUrl = await generateCompImage(comp, groupUsedHeroes);
+        const compHeroes = getCompHeroes(comp, groupUsedHeroes);
+        compHeroes.forEach(h => groupUsedHeroes.add(h));
+        const img = await new Promise((resolve) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.src = dataUrl;
+        });
+        groupImages.push({ img, comp, groupLabel: group.label, groupColor: group.color });
+      }
+      compImages = compImages.concat(groupImages);
+    }
+  } else {
+    // Normal single-group export
+    const exportUsedHeroes = new Set();
+    for (const comp of comps) {
+      const dataUrl = await generateCompImage(comp, exportUsedHeroes);
+      const compHeroes = getCompHeroes(comp, exportUsedHeroes);
+      compHeroes.forEach(h => exportUsedHeroes.add(h));
+      const img = await new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.src = dataUrl;
+      });
+      compImages.push({ img, comp });
+    }
   }
 
   if (compImages.length === 0) {
@@ -2640,12 +2658,14 @@ async function exportCompsAsPNG(comps) {
   }
   
   // Calculate canvas size (arrange images horizontally with spacing and text)
-  const spacing = 20; // Horizontal space between images
-  const textHeight = 80; // Space for team name and compID below each image
-  const headerHeight = 60; // Space for boss info at top
+  const spacing = 20;
+  const textHeight = 80;
+  const headerHeight = 60;
+  // Extra row height for group section labels (only when groups provided)
+  const groupLabelHeight = groups ? 36 : 0;
   const maxImageHeight = Math.max(...compImages.map(item => item.img.height));
   const totalWidth = compImages.reduce((sum, item) => sum + item.img.width, 0) + (spacing * (compImages.length - 1));
-  const totalHeight = headerHeight + maxImageHeight + textHeight;
+  const totalHeight = headerHeight + groupLabelHeight + maxImageHeight + textHeight;
   
   canvas.width = totalWidth;
   canvas.height = totalHeight;
@@ -2655,42 +2675,57 @@ async function exportCompsAsPNG(comps) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
   // Draw boss header
-  let bossText = 'Endboss';
+  let bossText = TRANSLATIONS[currentLang].endboss || 'Endboss';
   if (selectedBossType === 'miniboss') {
-    // Convert "wedge-of-power" to "Wedge of Power"
-    const formattedName = selectedBoss.split('-').map(word => 
+    const formattedName = selectedBoss.split('-').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
-    bossText = `Miniboss - ${formattedName}`;
+    bossText = `${TRANSLATIONS[currentLang].minibosses || 'Miniboss'} - ${formattedName}`;
   } else if (selectedBossType === 'stronghold') {
-    // Capitalize color: "red" to "Red"
     const formattedColor = selectedBoss.charAt(0).toUpperCase() + selectedBoss.slice(1);
-    bossText = `Strongholds - ${formattedColor}`;
+    bossText = `${TRANSLATIONS[currentLang].strongholds || 'Strongholds'} - ${formattedColor}`;
   }
   ctx.fillStyle = '#4a9eff';
   ctx.font = 'bold 28px Arial';
   ctx.textAlign = 'center';
   ctx.fillText(bossText, totalWidth / 2, 40);
   
-  // Draw each comp image with labels (left to right)
+  // Draw group section labels if present (below main header)
+  if (groups) {
+    let xOffsetLabel = 0;
+    let groupIdx = 0;
+    let groupStart = 0;
+    for (let i = 0; i < compImages.length; i++) {
+      const item = compImages[i];
+      const isLastInGroup = (i === compImages.length - 1) || compImages[i + 1].groupLabel !== item.groupLabel;
+      if (isLastInGroup) {
+        const groupEnd = i;
+        const groupWidth = compImages.slice(groupStart, groupEnd + 1).reduce((s, ci) => s + ci.img.width + spacing, 0) - spacing;
+        const groupCenterX = xOffsetLabel + groupWidth / 2;
+        ctx.fillStyle = groups[groupIdx].color || '#4a9eff';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.groupLabel || '', groupCenterX, headerHeight + 22);
+        xOffsetLabel += groupWidth + spacing;
+        groupIdx++;
+        groupStart = groupEnd + 1;
+      }
+    }
+  }
+  
+  // Draw each comp image with labels
   let xOffset = 0;
+  const imageTop = headerHeight + groupLabelHeight;
   for (const { img, comp } of compImages) {
     const centerX = xOffset + img.width / 2;
-    
-    // Draw comp image
-    ctx.drawImage(img, xOffset, headerHeight);
-    
-    // Draw team name below image
+    ctx.drawImage(img, xOffset, imageTop);
     ctx.fillStyle = '#e5e7eb';
     ctx.font = 'bold 18px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(comp.name || 'Team', centerX, headerHeight + img.height + 25);
-    
-    // Draw compID below team name
+    ctx.fillText(comp.name || 'Team', centerX, imageTop + img.height + 25);
     ctx.fillStyle = '#94a3b8';
     ctx.font = '16px Arial';
-    ctx.fillText(comp.compID || TRANSLATIONS[currentLang].noCompID, centerX, headerHeight + img.height + 50);
-    
+    ctx.fillText(comp.compID || TRANSLATIONS[currentLang].noCompID, centerX, imageTop + img.height + 50);
     xOffset += img.width + spacing;
   }
   
@@ -3008,7 +3043,10 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
         exportBtn.style.borderRadius = "4px";
         exportBtn.style.cursor = "pointer";
         exportBtn.style.fontWeight = "bold";
-        exportBtn.onclick = () => exportCompsAsPNG(allRecommendedTeams);
+        exportBtn.onclick = () => exportCompsAsPNG(allRecommendedTeams, [
+          { teams: unrivaledRecommended, label: TRANSLATIONS[currentLang].unrivaledMight || '⚔️ Unrivaled Might', color: '#f59e0b' },
+          { teams: hallRecommended, label: TRANSLATIONS[currentLang].hallOfLegends || '🏛️ Hall of Legends', color: '#8b5cf6' }
+        ]);
         exportContainer.appendChild(exportBtn);
       }
       
