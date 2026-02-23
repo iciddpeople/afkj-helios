@@ -361,11 +361,10 @@
         },
         {
           "name": "Shadewing",
+          "tileID": 6,
           "replacements": [
-            "Baelran",
-            "Lenya"
-          ],
-          "tileID": 6
+            "Faramor"
+          ]
         },
         {
           "name": "Kordan",
@@ -471,6 +470,10 @@
         },
         {
           "name": "Solise",
+          "replacements": [
+            "Ravion",
+            "Solise"
+          ],
           "tileID": 12
         },
         {
