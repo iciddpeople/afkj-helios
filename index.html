@@ -537,15 +537,15 @@ button:active { background: #0284c7; }
     <img src="logo.png" alt="Logo" style="height:60px;width:60px;object-fit:contain;background:rgba(56,189,248,0.1);border-radius:12px;padding:4px;border:2px solid #38bdf8;" onerror="this.style.display='none'">
     <div style="display: flex; flex-direction: column;">
       <div style="font-size: 1.5em; font-weight: bold; color: #38bdf8; line-height: 1.2;">AFKJ - Helios</div>
-      <div style="font-size: 0.95em; color: #94a3b8; line-height: 1.2;">Game Mode Formations</div>
+      <div style="font-size: 0.95em; color: #94a3b8; line-height: 1.2;" data-i18n="gameModeFormations">Game Mode Formations</div>
     </div>
   </div>
   <div class="header-selectors" style="flex: 1; padding-left: 24px; padding-right: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; box-sizing: border-box;">
     <select id="gameModeSelector" style="padding: 10px 16px; background: #2a2a3e; color: white; border: 2px solid #38bdf8; border-radius: 6px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation; font-weight: 600;">
-      <option value="battle">Battle Drills</option>
-      <option value="guild">Guild Supremacy</option>
-      <option value="clash">Clash Fronts</option>
-      <option value="dream">Dream Realm</option>
+      <option value="battle" data-i18n="battleDrills">Battle Drills</option>
+      <option value="guild" data-i18n="guildSupremacy">Guild Supremacy</option>
+      <option value="clash" data-i18n="clashFronts">Clash Fronts</option>
+      <option value="dream" data-i18n="dreamRealm">Dream Realm</option>
     </select>
     <select id="languageSelector" onchange="changeLanguage(this.value)" style="padding: 10px 16px; background: #2a2a3e; color: white; border: 2px solid #4a9eff; border-radius: 6px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation; font-weight: 600; box-sizing: border-box;">
       <option value="en">English</option>
@@ -607,13 +607,13 @@ const MODES = {
     title: "Battle Drills Teams Recommendations",
     render: function() {
       const mapOptions = battleMaps.map(m => 
-        `<option value="${m.id}" ${m.id === selectedMap ? 'selected' : ''}>${m.name}${m.isCurrent ? ' (Current)' : ''}</option>`
+        `<option value="${m.id}" ${m.id === selectedMap ? 'selected' : ''}>${m.name}${m.isCurrent ? ` (${(TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang].currentMapBadge) || 'Current'})` : ''}</option>`
       ).join('');
       
       return `
       <div class="main-section">
         <div class="left-panel">
-          <button class="filters-toggle-btn" onclick="toggleFilters()">⚙️ Setup &amp; Heroes</button>
+          <button class="filters-toggle-btn" onclick="toggleFilters()"><span data-i18n="setupHeroes">⚙️ Setup &amp; Heroes</span></button>
           <div class="left-panel-content" id="leftPanelContent">
           <h2 data-i18n="battleMap">Battle Map</h2>
           <div style="margin-bottom: 20px;">
@@ -624,7 +624,7 @@ const MODES = {
           
           <h2 data-i18n="bossType">Boss Type</h2>
           <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-            <button id="btnEndboss" onclick="selectBossType('endboss')" style="padding: 12px; cursor: pointer; background: #4a9eff; color: white; border: 2px solid #4a9eff; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: flex; align-items: center; justify-content: center;"><span data-i18n="endboss">Endboss</span><span class="current-badge">CURRENT</span></button>
+            <button id="btnEndboss" onclick="selectBossType('endboss')" style="padding: 12px; cursor: pointer; background: #4a9eff; color: white; border: 2px solid #4a9eff; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: flex; align-items: center; justify-content: center;"><span data-i18n="endboss">Endboss</span><span class="current-badge" data-i18n="current">CURRENT</span></button>
             
             <!-- Single miniboss button (for Verdshroom) -->
             <button id="btnMiniboss" onclick="selectMiniboss()" style="padding: 12px; cursor: pointer; background: white; color: #333; border: 2px solid #ddd; border-radius: 4px; font-weight: bold; font-size: 16px; min-height: 44px; touch-action: manipulation; display: none; align-items: center; justify-content: center;"><span data-i18n="minibosses">Minibosses</span></button>
@@ -633,25 +633,25 @@ const MODES = {
             <div id="minibossDropdownContainer" style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: bold; color: #e5e7eb;" data-i18n="minibosses">Minibosses</label>
               <select id="minibossSelector" onchange="selectMiniboss(this.value)" style="padding: 10px; background: #1e293b; color: white; border: 2px solid #4a9eff; border-radius: 4px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation;">
-                <option value="">-- Select Miniboss --</option>
+                <option value="" data-i18n="selectMiniboss">-- Select Miniboss --</option>
               </select>
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: bold; color: #e5e7eb;" data-i18n="strongholds">Strongholds</label>
               <select id="strongholdSelector" onchange="selectStronghold(this.value)" style="padding: 10px; background: #1e293b; color: white; border: 2px solid #4a9eff; border-radius: 4px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation;">
-                <option value="">-- Select Stronghold --</option>
-                <option value="red">Red Stronghold</option>
-                <option value="blue">Blue Stronghold</option>
-                <option value="green">Green Stronghold</option>
+                <option value="" data-i18n="selectStronghold">-- Select Stronghold --</option>
+                <option value="red" data-i18n="redStronghold">Red Stronghold</option>
+                <option value="blue" data-i18n="blueStronghold">Blue Stronghold</option>
+                <option value="green" data-i18n="greenStronghold">Green Stronghold</option>
               </select>
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 5px;">
-              <label style="font-weight: bold; color: #e5e7eb;">Cleanup</label>
+              <label style="font-weight: bold; color: #e5e7eb;" data-i18n="cleanup">Cleanup</label>
               <select id="cleanupSelector" onchange="selectCleanup(this.value)" style="padding: 10px; background: #1e293b; color: white; border: 2px solid #4a9eff; border-radius: 4px; cursor: pointer; font-size: 16px; min-height: 44px; touch-action: manipulation;">
-                <option value="">-- Select Cleanup --</option>
-                <option value="cleanup">Cleanup Teams</option>
+                <option value="" data-i18n="selectCleanup">-- Select Cleanup --</option>
+                <option value="cleanup" data-i18n="cleanupTeams">Cleanup Teams</option>
               </select>
             </div>
           </div>
@@ -694,19 +694,19 @@ const MODES = {
   guild: {
     title: "Guild Supremacy (Coming Soon)",
     render: function() {
-      return `<div style=\"text-align:center;padding:60px 0;\"><h2>Guild Supremacy</h2><p>Mode coming soon!</p></div>`;
+      return `<div style=\"text-align:center;padding:60px 0;\"><h2 data-i18n=\"guildSupremacy\">Guild Supremacy</h2><p data-i18n=\"comingSoon\">Mode coming soon!</p></div>`;
     }
   },
   clash: {
     title: "Clash Fronts (Coming Soon)",
     render: function() {
-      return `<div style=\"text-align:center;padding:60px 0;\"><h2>Clash Fronts</h2><p>Mode coming soon!</p></div>`;
+      return `<div style=\"text-align:center;padding:60px 0;\"><h2 data-i18n=\"clashFronts\">Clash Fronts</h2><p data-i18n=\"comingSoon\">Mode coming soon!</p></div>`;
     }
   },
   dream: {
     title: "Dream Realm (Coming Soon)",
     render: function() {
-      return `<div style=\"text-align:center;padding:60px 0;\"><h2>Dream Realm</h2><p>Mode coming soon!</p></div>`;
+      return `<div style=\"text-align:center;padding:60px 0;\"><h2 data-i18n=\"dreamRealm\">Dream Realm</h2><p data-i18n=\"comingSoon\">Mode coming soon!</p></div>`;
     }
   }
 };
@@ -736,6 +736,7 @@ async function renderMode(mode) {
   }
   
   modeContentEl.innerHTML = modeObj.render();
+  applyTranslations(currentLang);
   // document.getElementById('modeTitle').textContent = modeObj.title; // Removed as part of header redesign
   
   // Load mode-specific data and render
@@ -801,6 +802,16 @@ async function loadTranslations() {
 
 let currentLang = localStorage.getItem('language') || 'en';
 
+function applyTranslations(lang) {
+  if (!translationsLoaded) return;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+      el.textContent = TRANSLATIONS[lang][key];
+    }
+  });
+}
+
 function changeLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('language', lang);
@@ -810,12 +821,7 @@ function changeLanguage(lang) {
     return;
   }
   
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
-      el.textContent = TRANSLATIONS[lang][key];
-    }
-  });
+  applyTranslations(lang);
   
   // Re-render results if they exist to update translated hints and headers
   const result = document.getElementById('result');
@@ -1687,7 +1693,7 @@ function populateMinibossDropdown() {
     
     // Populate dropdown with map-specific minibosses
     if (minibossSelector) {
-      minibossSelector.innerHTML = '<option value="">-- Select Miniboss --</option>';
+      minibossSelector.innerHTML = `<option value="" data-i18n="selectMiniboss">${(TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang].selectMiniboss) || '-- Select Miniboss --'}</option>`;
       currentMinibosses.forEach(miniboss => {
         const option = document.createElement('option');
         option.value = miniboss.id;
@@ -2884,8 +2890,8 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
       unrivaledHeader.style.marginBottom = '15px';
       unrivaledHeader.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
       unrivaledHeader.innerHTML = `
-        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 4px;">⚔️ Unrivaled Might</div>
-        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px;">60% damage boost to one carry</div>
+        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 4px;">${TRANSLATIONS[currentLang].unrivaledMight || '⚔️ Unrivaled Might'}</div>
+        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px;">${TRANSLATIONS[currentLang].unrivaledMightDesc || '60% damage boost to one carry'}</div>
       `;
       unrivaledSection.appendChild(unrivaledHeader);
       
@@ -2905,8 +2911,8 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
         emptyMsg.style.width = '100%';
         emptyMsg.innerHTML = `
           <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
-          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">No Available Teams</div>
-          <div style="font-size: 13px;">No teams configured for this buff, or heroes currently unavailable</div>
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${TRANSLATIONS[currentLang].noAvailableTeams || 'No Available Teams'}</div>
+          <div style="font-size: 13px;">${TRANSLATIONS[currentLang].noTeamsConfigured || 'No teams configured for this buff, or heroes currently unavailable'}</div>
         `;
         unrivaledTeamsContainer.appendChild(emptyMsg);
       }
@@ -2925,8 +2931,8 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
       hallHeader.style.marginBottom = '15px';
       hallHeader.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
       hallHeader.innerHTML = `
-        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 4px;">🏛️ Hall of Legends</div>
-        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px;">40% damage boost to three carries</div>
+        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 4px;">${TRANSLATIONS[currentLang].hallOfLegends || '🏛️ Hall of Legends'}</div>
+        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px;">${TRANSLATIONS[currentLang].hallOfLegendsDesc || '40% damage boost to three carries'}</div>
       `;
       hallSection.appendChild(hallHeader);
       
@@ -2946,8 +2952,8 @@ async function renderResult(recommended, allComps, validComps, globalUsedHeroes 
         emptyMsg.style.width = '100%';
         emptyMsg.innerHTML = `
           <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
-          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">No Available Teams</div>
-          <div style="font-size: 13px;">No teams configured for this buff, or heroes currently unavailable</div>
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${TRANSLATIONS[currentLang].noAvailableTeams || 'No Available Teams'}</div>
+          <div style="font-size: 13px;">${TRANSLATIONS[currentLang].noTeamsConfigured || 'No teams configured for this buff, or heroes currently unavailable'}</div>
         `;
         hallTeamsContainer.appendChild(emptyMsg);
       }
@@ -3046,7 +3052,7 @@ async function renderTeams(teams, container, showExportBtn = false) {
     compIDDiv.style.cursor = "pointer";
     compIDDiv.style.userSelect = "all";
     compIDDiv.textContent = c.compID || TRANSLATIONS[currentLang].noCompID;
-    compIDDiv.title = "Click to copy";
+    compIDDiv.title = TRANSLATIONS[currentLang].clickToCopy || "Click to copy";
     compIDDiv.onclick = function() {
       navigator.clipboard.writeText(c.compID || '');
       this.style.background = '#2563eb';
