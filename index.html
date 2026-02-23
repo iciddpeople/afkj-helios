@@ -2337,13 +2337,17 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
     }
   }
   
-  // Load the template image
+  // Load the template image — use map-specific path for battle mode
   const modeFolder = MODES[currentMode]?.folder || 'battle';
+  let templatePath = `comps/${modeFolder}/empty.png`;
+  if (currentMode === 'battle' && selectedMap) {
+    templatePath = `comps/${modeFolder}/${selectedMap}/empty.png`;
+  }
   const template = await new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = reject;
-    img.src = `comps/${modeFolder}/empty.png`;
+    img.src = templatePath;
   });
   
   canvas.width = template.width;
@@ -2598,6 +2602,16 @@ async function generateCompImage(comp, globalUsedHeroes = new Set()) {
 }
 
 async function exportCompsAsPNG(comps) {
+  // Find the export button and show loading state
+  const exportBtn = document.querySelector('#exportButtonContainer button');
+  const originalText = exportBtn ? exportBtn.textContent : '';
+  if (exportBtn) {
+    exportBtn.textContent = '⏳ Generating...';
+    exportBtn.disabled = true;
+    exportBtn.style.opacity = '0.7';
+  }
+
+  try {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   
@@ -2618,6 +2632,11 @@ async function exportCompsAsPNG(comps) {
       image.src = dataUrl;
     });
     compImages.push({ img, comp });
+  }
+
+  if (compImages.length === 0) {
+    alert('No team images could be generated.');
+    return;
   }
   
   // Calculate canvas size (arrange images horizontally with spacing and text)
@@ -2680,6 +2699,17 @@ async function exportCompsAsPNG(comps) {
   link.download = `team-comps-${Date.now()}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
+
+  } catch (err) {
+    console.error('Export failed:', err);
+    alert('Export failed: ' + (err.message || err));
+  } finally {
+    if (exportBtn) {
+      exportBtn.textContent = originalText;
+      exportBtn.disabled = false;
+      exportBtn.style.opacity = '1';
+    }
+  }
 }
 
 async function renderResult(recommended, allComps, validComps, globalUsedHeroes = new Set(), needBuffSeparation = false){
