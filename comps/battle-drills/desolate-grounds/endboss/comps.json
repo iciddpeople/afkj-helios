@@ -186,12 +186,12 @@
         },
         {
           "name": "Aliceth",
-          "tileID": 3,
           "replacements": [
             "Aliceth",
             "Kulu",
             "Mehira"
-          ]
+          ],
+          "tileID": 3
         },
         {
           "name": "Shemira",
