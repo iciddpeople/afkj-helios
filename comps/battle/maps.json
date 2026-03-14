@@ -1,29 +1,250 @@
 {
-  "_comment": "To add a new map: 1) Create folder under comps/battle/{map-id}/, 2) Add map.jpg (battle map image), empty.png (formation template), comps.json, and tiles.json, 3) Add map entry below with 'isCurrent: true' to make it default. DESOLATE-GROUNDS TEMPORARILY DISABLED.",
+  "_comment": "To add a new map: see HOW_TO_UPDATE.md or copilot-instructions.md. Set isCurrent:true on the active map, false on all others.",
   "maps": [
+    {
+      "id": "desolate-grounds",
+      "name": "Desolate Grounds",
+      "isCurrent": true,
+      "season": 6,
+      "description": "A barren wasteland of ruins and ash",
+      "minibosses": [
+        { "id": "wedge-of-power", "name": "Wedge of Power", "order": 17 },
+        { "id": "wedge-of-matter", "name": "Wedge of Matter", "order": 18 }
+      ],
+      "bossPositions": [
+        {
+          "type": "camp",
+          "order": 1,
+          "x": 973,
+          "y": 630
+        },
+        {
+          "type": "stronghold",
+          "order": 2,
+          "color": "red",
+          "x": 817,
+          "y": 657
+        },
+        {
+          "type": "stronghold",
+          "order": 3,
+          "color": "green",
+          "x": 975,
+          "y": 879
+        },
+        {
+          "type": "stronghold",
+          "order": 4,
+          "color": "red",
+          "x": 782,
+          "y": 1058
+        },
+        {
+          "type": "stronghold",
+          "order": 5,
+          "color": "blue",
+          "x": 586,
+          "y": 1101
+        },
+        {
+          "type": "stronghold",
+          "order": 6,
+          "color": "green",
+          "x": 379,
+          "y": 1060
+        },
+        {
+          "type": "stronghold",
+          "order": 7,
+          "color": "red",
+          "x": 198,
+          "y": 879
+        },
+        {
+          "type": "stronghold",
+          "order": 8,
+          "color": "green",
+          "x": 377,
+          "y": 669
+        },
+        {
+          "type": "camp",
+          "order": 9,
+          "x": 230,
+          "y": 649
+        },
+        {
+          "type": "stronghold",
+          "order": 10,
+          "color": "blue",
+          "x": 965,
+          "y": 430
+        },
+        {
+          "type": "stronghold",
+          "order": 11,
+          "color": "blue",
+          "x": 792,
+          "y": 270
+        },
+        {
+          "type": "stronghold",
+          "order": 12,
+          "color": "red",
+          "x": 594,
+          "y": 232
+        },
+        {
+          "type": "stronghold",
+          "order": 13,
+          "color": "green",
+          "x": 398,
+          "y": 273
+        },
+        {
+          "type": "stronghold",
+          "order": 14,
+          "color": "red",
+          "x": 215,
+          "y": 422
+        },
+        {
+          "type": "stronghold",
+          "order": 15,
+          "color": "blue",
+          "x": 487,
+          "y": 865
+        },
+        {
+          "type": "stronghold",
+          "order": 16,
+          "color": "green",
+          "x": 694,
+          "y": 441
+        },
+        {
+          "type": "miniboss",
+          "order": 17,
+          "id": "Wedge of Power (17)",
+          "x": 758,
+          "y": 842
+        },
+        {
+          "type": "miniboss",
+          "order": 18,
+          "id": "Wedge of Matter (18)",
+          "x": 454,
+          "y": 441
+        },
+        {
+          "type": "endboss",
+          "order": 19,
+          "x": 597,
+          "y": 622
+        }
+      ]
+    },
     {
       "id": "verdshroom",
       "name": "Verdshroom",
-      "isCurrent": true,
-      "season": 2,
+      "isCurrent": false,
+      "season": 6,
       "description": "A mystical forest filled with giant mushrooms",
       "minibosses": [
-        { "id": "abyssal-reaper", "name": "Abyssal Reaper", "order": 10 },
-        { "id": "abyssal-penitent", "name": "Abyssal Penitent", "order": 11 }
+        {
+          "id": "abyssal-reaper",
+          "name": "Abyssal Reaper",
+          "order": 10
+        },
+        {
+          "id": "abyssal-penitent",
+          "name": "Abyssal Penitent",
+          "order": 11
+        }
       ],
-	  "bossPositions": [
-        { "type": "camp", "order": 1, "x": 658, "y": 1340 },
-        { "type": "stronghold", "color": "red", "order": 2, "x": 946, "y": 1016 },
-        { "type": "stronghold", "color": "green", "order": 3, "x": 988, "y": 719 },
-        { "type": "stronghold", "color": "blue", "order": 4, "x": 356, "y": 1171 },
-        { "type": "stronghold", "color": "red", "order": 5, "x": 339, "y": 918 },
-        { "type": "stronghold", "color": "red", "order": 6, "x": 675, "y": 1050 },
-        { "type": "stronghold", "color": "green", "order": 7, "x": 612, "y": 883 },
-        { "type": "stronghold", "color": "green", "order": 8, "x": 408, "y": 647 },
-        { "type": "stronghold", "color": "blue", "order": 9, "x": 683, "y": 651 },
-        { "type": "miniboss", "id": "Abyssal Reaper (10)", "order": 10, "x": 898, "y": 475 },
-        { "type": "miniboss", "id": "Abyssal Penitent (11)", "order": 11, "x": 412, "y": 479 },
-        { "type": "endboss", "order": 12, "x": 644, "y": 324 }
+      "bossPositions": [
+        {
+          "type": "camp",
+          "order": 1,
+          "x": 658,
+          "y": 1340
+        },
+        {
+          "type": "stronghold",
+          "color": "red",
+          "order": 2,
+          "x": 946,
+          "y": 1016
+        },
+        {
+          "type": "stronghold",
+          "color": "green",
+          "order": 3,
+          "x": 988,
+          "y": 719
+        },
+        {
+          "type": "stronghold",
+          "color": "blue",
+          "order": 4,
+          "x": 356,
+          "y": 1171
+        },
+        {
+          "type": "stronghold",
+          "color": "red",
+          "order": 5,
+          "x": 339,
+          "y": 918
+        },
+        {
+          "type": "stronghold",
+          "color": "red",
+          "order": 6,
+          "x": 675,
+          "y": 1050
+        },
+        {
+          "type": "stronghold",
+          "color": "green",
+          "order": 7,
+          "x": 612,
+          "y": 883
+        },
+        {
+          "type": "stronghold",
+          "color": "green",
+          "order": 8,
+          "x": 408,
+          "y": 647
+        },
+        {
+          "type": "stronghold",
+          "color": "blue",
+          "order": 9,
+          "x": 683,
+          "y": 651
+        },
+        {
+          "type": "miniboss",
+          "id": "Abyssal Reaper (10)",
+          "order": 10,
+          "x": 898,
+          "y": 475
+        },
+        {
+          "type": "miniboss",
+          "id": "Abyssal Penitent (11)",
+          "order": 11,
+          "x": 412,
+          "y": 479
+        },
+        {
+          "type": "endboss",
+          "order": 12,
+          "x": 644,
+          "y": 324
+        }
       ]
     }
   ]

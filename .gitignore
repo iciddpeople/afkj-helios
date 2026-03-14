@@ -16,6 +16,7 @@ RESTORE_INSTRUCTIONS.txt
 # Admin Files (keep local only, don't deploy)
 admin-api.py
 admin-enhanced.html
+boss_position_picker.html
 requirements.txt
 ADMIN_*.md
 

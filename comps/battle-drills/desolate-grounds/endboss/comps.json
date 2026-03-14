@@ -1,0 +1,223 @@
+{
+  "teams": [
+    {
+      "artifact": {
+        "name": "Starshower",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "compID": "DESOLATE_ENDBOSS_T1",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Koko",
+          "tileID": 2
+        },
+        {
+          "name": "Shadewing",
+          "tileID": 7
+        },
+        {
+          "name": "Kordan",
+          "tileID": 11
+        },
+        {
+          "name": "Faramor",
+          "tileID": 12
+        },
+        {
+          "name": "Nazrik",
+          "tileID": 13
+        }
+      ],
+      "hint": "Best < 50%",
+      "imageData": null,
+      "name": "desolate_endboss_t1",
+      "order": 0,
+      "phantimal": {
+        "name": "Alpha Bear",
+        "tileID": "4"
+      }
+    },
+    {
+      "artifact": {
+        "name": "Arcanewild",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "compID": "DESOLATE_ENDBOSS_T2",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Silven",
+          "tileID": 6
+        },
+        {
+          "name": "Cassadee",
+          "tileID": 9
+        },
+        {
+          "name": "Hugin",
+          "tileID": 11
+        },
+        {
+          "name": "Solise",
+          "tileID": 12
+        },
+        {
+          "name": "Gunnar",
+          "replacements": [
+            "Thoran"
+          ],
+          "tileID": 13
+        }
+      ],
+      "hint": "Best > 50%",
+      "imageData": null,
+      "name": "desolate_endboss_t2",
+      "order": 1,
+      "phantimal": {
+        "name": "Sigmund",
+        "tileID": "8"
+      },
+      "subTeamId": "DESOLATE_ENDBOSS_T2S1"
+    },
+    {
+      "artifact": {
+        "name": "Arcanewild",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "compID": "DESOLATE_ENDBOSS_T2S1",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Sinbad",
+          "tileID": 4
+        },
+        {
+          "name": "Marcille",
+          "tileID": 6
+        },
+        {
+          "name": "Cassadee",
+          "tileID": 9
+        },
+        {
+          "name": "Hugin",
+          "tileID": 11
+        },
+        {
+          "name": "Solise",
+          "tileID": 12
+        }
+      ],
+      "hint": "Best > 50%",
+      "imageData": null,
+      "isSubTeam": true,
+      "name": "desolate_endboss_t2s1",
+      "order": 2,
+      "phantimal": {
+        "name": "Sigmund",
+        "tileID": "7"
+      },
+      "subTeamId": "DESOLATE_ENDBOSS_T2S2"
+    },
+    {
+      "artifact": {
+        "name": "Starshower",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "compID": "DESOLATE_ENDBOSS_T2S2",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Talene",
+          "replacements": [
+            "Isabella"
+          ],
+          "tileID": 4
+        },
+        {
+          "name": "Lenya",
+          "tileID": 6
+        },
+        {
+          "name": "Zandrok",
+          "tileID": 9
+        },
+        {
+          "name": "Baelran",
+          "tileID": 11
+        },
+        {
+          "name": "Mikola",
+          "tileID": 13
+        }
+      ],
+      "hint": "Best > 50%",
+      "imageData": null,
+      "isSubTeam": true,
+      "name": "desolate_endboss_t2s2",
+      "order": 3,
+      "phantimal": {
+        "name": "Alpha Bear",
+        "tileID": "8"
+      }
+    },
+    {
+      "artifact": {
+        "name": "Arcanewild",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "compID": "DESOLATE_ENDBOSS_T3",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Elijah",
+          "tileID": 1
+        },
+        {
+          "name": "Aliceth",
+          "tileID": 3,
+          "replacements": [
+            "Aliceth",
+            "Kulu",
+            "Mehira"
+          ]
+        },
+        {
+          "name": "Shemira",
+          "tileID": 4
+        },
+        {
+          "name": "Velara",
+          "tileID": 6
+        },
+        {
+          "name": "Reinier",
+          "tileID": 9
+        },
+        {
+          "name": "Lailah",
+          "tileID": 10
+        }
+      ],
+      "hint": "",
+      "imageData": null,
+      "name": "desolate_endboss_t3",
+      "order": 4,
+      "phantimal": {
+        "name": "Skyclops",
+        "tileID": 2
+      }
+    }
+  ]
+}

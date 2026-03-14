@@ -1005,6 +1005,7 @@ const HEROES = {
   Gala: { name:"Gala", class:"Mage", faction:"Mauler", icon:"heroes/Gala.png" },
   Gerda: { name:"Gerda", class:"Tank", faction:"Mauler", icon:"heroes/Gerda.png" },
   Granny_Dahnie: { name:"Granny Dahnie", class:"Tank", faction:"Wilder", icon:"heroes/Granny Dahnie.png" },
+  Gunnar: { name:"Gunnar", class:"Tank", faction:"Hypogean", icon:"heroes/Gunnar.png" },
   Hammie: { name:"Hammie", class:"Mage", faction:"Lightbearer", icon:"heroes/Hammie.png" },
   Harak: { name:"Harak", class:"Warrior", faction:"Hypogean", icon:"heroes/Harak.png" },
   Hewynn: { name:"Hewynn", class:"Support", faction:"Wilder", icon:"heroes/Hewynn.png" },
@@ -1043,6 +1044,7 @@ const HEROES = {
   Pang: { name:"Pang", class:"Warrior", faction:"Wilder", icon:"heroes/Pang.png" },
   Parisa: { name:"Parisa", class:"Mage", faction:"Wilder", icon:"heroes/Parisa.png" },
   Perseus: { name:"Perseus", class:"Warrior", faction:"Lightbearer", icon:"heroes/Perseus.png" },
+  Pippa: { name:"Pippa", class:"Mage", faction:"Wilder", icon:"heroes/Pippa.png" },
   Phraesto: { name:"Phraesto", class:"Tank", faction:"Hypogean", icon:"heroes/Phraesto.png" },
   Phraesto_Clone: { name:"Phraesto Clone", class:"Tank", faction:"Hypogean", icon:"heroes/Phraesto Clone.png" },
   Ravion: { name:"Ravion", class:"Rogue", faction:"Wilder", icon:"heroes/Ravion.png" },
@@ -1079,7 +1081,8 @@ const HEROES = {
   Walker: { name:"Walker", class:"Rogue", faction:"Lightbearer", icon:"heroes/Walker.png" },
   Zandrok: { name:"Zandrok", class:"Warrior", faction:"Mauler", icon:"heroes/Zandrok.png" },
   Zanie: { name:"Zanie", class:"Marksman", faction:"Lightbearer", icon:"heroes/Zanie.png" },
-  Zanie_Turret: { name:"Zanie Turret", class:"Marksman", faction:"Lightbearer", icon:"heroes/Zanie Turret.png" }
+  Zanie_Turret: { name:"Zanie Turret", class:"Marksman", faction:"Lightbearer", icon:"heroes/Zanie Turret.png" },
+  Zorya: { name:"Zorya", class:"Warrior", faction:"Graveborn", icon:"heroes/Zorya.png" }
 };
 
 /* ==========================
@@ -2222,6 +2225,148 @@ function getActiveHero(heroSlot, usedHeroes = new Set(), globalUsedHeroes = new 
   return null;
 }
 
+// Renders a team formation as a DOM element (empty.png background + absolutely-positioned hero icons).
+// Used for display only — export still uses generateCompImage (canvas).
+async function renderCompFormation(comp, globalUsedHeroes = new Set()) {
+  // ── 1. Determine which heroes to draw (override detection, same logic as generateCompImage) ──
+  let heroesToDraw = comp.heroes;
+  let useOverride = false;
+  let activeOverride = null;
+
+  for (const heroSlot of comp.heroes) {
+    if (useOverride) break;
+    if (!heroSlot.replacements) continue;
+
+    const primaryAvailable = HEROES[heroSlot.name] && !missingHeroes.has(heroSlot.name) && !globalUsedHeroes.has(heroSlot.name);
+    if (primaryAvailable) continue;
+
+    // Check if any simple (non-override) replacement is available
+    let foundSimple = false;
+    for (const r of heroSlot.replacements) {
+      const rName = typeof r === 'string' ? r : r.name;
+      if (typeof r === 'object' && r.heroesOverride) continue;
+      if (HEROES[rName] && !missingHeroes.has(rName) && !globalUsedHeroes.has(rName)) { foundSimple = true; break; }
+    }
+    if (foundSimple) continue;
+
+    // Try heroesOverride replacements
+    for (const r of heroSlot.replacements) {
+      if (typeof r !== 'object' || !r.heroesOverride) continue;
+      if (!HEROES[r.name] || missingHeroes.has(r.name) || globalUsedHeroes.has(r.name)) continue;
+      const allAvail = r.heroesOverride.every(h => {
+        if (HEROES[h.name] && !missingHeroes.has(h.name) && !globalUsedHeroes.has(h.name)) return true;
+        const checkReps = (reps) => reps && reps.some(rep => {
+          const repName = typeof rep === 'string' ? rep : rep.name;
+          if (typeof rep === 'object' && rep.heroesOverride) return false;
+          return HEROES[repName] && !missingHeroes.has(repName) && !globalUsedHeroes.has(repName);
+        });
+        if (checkReps(h.replacements)) return true;
+        const orig = comp.heroes.find(o => o.name === h.name);
+        return checkReps(orig?.replacements);
+      });
+      if (allAvail) { heroesToDraw = r.heroesOverride; useOverride = true; activeOverride = r; break; }
+    }
+  }
+
+  // ── 2. Template path ──
+  const modeFolder = MODES[currentMode]?.folder || 'battle';
+  let templatePath = `comps/${modeFolder}/empty.png`;
+  if (currentMode === 'battle' && selectedMap) templatePath = `comps/${modeFolder}/${selectedMap}/empty.png`;
+
+  // All empty.png templates are 405×333 px
+  const TW = 405, TH = 333;
+
+  // ── 3. Build container ──
+  // bgImg is in-flow (height:auto) so the container's height = rendered image height.
+  // Absolutely-positioned icons then use top:Y% relative to that same height — always correct.
+  const container = document.createElement('div');
+  container.style.cssText = 'position:relative;width:100%;margin-bottom:10px;';
+
+  const bgImg = document.createElement('img');
+  bgImg.src = templatePath;
+  bgImg.alt = 'Formation';
+  bgImg.style.cssText = 'width:100%;height:auto;display:block;border-radius:8px;max-width:none;max-height:none;margin:0;';
+  container.appendChild(bgImg);
+
+  // ── 4. Detect heroes that appear multiple times ──
+  const heroCount = {};
+  heroesToDraw.forEach(h => { heroCount[h.name] = (heroCount[h.name] || 0) + 1; });
+  const multiAppear = Object.keys(heroCount).filter(n => heroCount[n] > 1);
+
+  const usedHeroes = new Set(globalUsedHeroes);
+
+  const placeIcon = (src, name, tileID) => {
+    const tp = tilePositions[tileID];
+    if (!tp) return;
+    const el = document.createElement('img');
+    el.src = src;
+    el.alt = name;
+    el.title = name;
+    el.style.cssText = `position:absolute;width:${(tp.size/TW)*100}%;left:${(tp.x/TW)*100}%;top:${(tp.y/TH)*100}%;transform:translate(-50%,-50%);pointer-events:none;`;
+    container.appendChild(el);
+  };
+
+  // ── 5. Resolve and place each hero ──
+  for (const heroSlot of heroesToDraw) {
+    let activeHero;
+
+    if (useOverride) {
+      const canMulti = heroSlot.name.includes('Turret') || heroSlot.name.includes('Clone') || heroSlot.name.includes('Tower') || multiAppear.includes(heroSlot.name);
+      const key = canMulti ? `${heroSlot.name}@${heroSlot.tileID}` : heroSlot.name;
+      if (HEROES[heroSlot.name] && !missingHeroes.has(heroSlot.name) && !usedHeroes.has(key) && !globalUsedHeroes.has(heroSlot.name)) {
+        activeHero = { name: heroSlot.name, tileID: heroSlot.tileID };
+      } else {
+        const tryReps = (reps) => {
+          if (!reps) return null;
+          for (const r of reps) {
+            const rName = typeof r === 'string' ? r : r.name;
+            if (typeof r === 'object' && r.heroesOverride) continue;
+            const rCanMulti = rName.includes('Turret') || rName.includes('Clone') || rName.includes('Tower') || multiAppear.includes(rName);
+            const rKey = rCanMulti ? `${rName}@${heroSlot.tileID}` : rName;
+            if (HEROES[rName] && !missingHeroes.has(rName) && !usedHeroes.has(rKey) && !globalUsedHeroes.has(rName))
+              return { name: rName, tileID: heroSlot.tileID };
+          }
+          return null;
+        };
+        activeHero = tryReps(heroSlot.replacements) ||
+                     tryReps(comp.heroes.find(o => o.name === heroSlot.name)?.replacements);
+      }
+    } else {
+      activeHero = getActiveHero(heroSlot, usedHeroes, globalUsedHeroes, multiAppear);
+    }
+
+    if (!activeHero) continue;
+
+    // Clone/multi-appearance icon handling
+    let displayName = activeHero.name;
+    if (multiAppear.includes(activeHero.name)) {
+      const timesUsed = Array.from(usedHeroes).filter(k => k.startsWith(activeHero.name + '@')).length;
+      if (timesUsed >= 1 && HEROES[`${activeHero.name}_Clone`]) displayName = HEROES[`${activeHero.name}_Clone`].name;
+    }
+
+    const canMulti = activeHero.name.includes('Turret') || activeHero.name.includes('Clone') || activeHero.name.includes('Tower') || multiAppear.includes(activeHero.name);
+    usedHeroes.add(canMulti ? `${activeHero.name}@${activeHero.tileID}` : activeHero.name);
+
+    const heroKey = displayName.replace(/ /g, '_');
+    const hero = HEROES[heroKey] || HEROES[displayName];
+    if (hero) placeIcon(hero.icon, hero.name, activeHero.tileID);
+  }
+
+  // ── 6. Artifact ──
+  if (comp.artifact?.name && comp.artifact?.tileID) {
+    const art = ARTIFACTS[comp.artifact.name];
+    if (art) placeIcon(art.icon, comp.artifact.name, comp.artifact.tileID);
+  }
+
+  // ── 7. Phantimal ──
+  const phantimal = (useOverride && activeOverride?.phantimalOverride) ? activeOverride.phantimalOverride : comp.phantimal;
+  if (phantimal?.name && phantimal?.tileID) {
+    placeIcon(`phantimals/${phantimal.name}.png`, phantimal.name, phantimal.tileID);
+  }
+
+  return container;
+}
+
 async function generateCompImage(comp, globalUsedHeroes = new Set()) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -3097,20 +3242,13 @@ async function renderTeams(teams, container, showExportBtn = false) {
     teamHeader.style.fontWeight = "bold";
     d.appendChild(teamHeader);
     
-    // Generate dynamic comp image using template + hero icons
-    const compImageUrl = await generateCompImage(c, renderUsedHeroes);
-    
+    // Render formation as positioned DOM elements (crisp icons over empty.png template)
+    const formationEl = await renderCompFormation(c, renderUsedHeroes);
+
     // Update used heroes for next team
     const compHeroes = getCompHeroes(c, renderUsedHeroes);
     compHeroes.forEach(h => renderUsedHeroes.add(h));
-    
-    const img = document.createElement("img");
-    img.src = compImageUrl;
-    img.style.width = "100%";
-    img.style.height = "auto";
-    img.style.borderRadius = "8px";
-    img.style.marginBottom = "10px";
-    
+
     const compIDDiv = document.createElement("div");
     compIDDiv.style.marginTop = "10px";
     compIDDiv.style.padding = "10px";
@@ -3127,7 +3265,7 @@ async function renderTeams(teams, container, showExportBtn = false) {
       setTimeout(() => this.style.background = '#1e293b', 200);
     };
     
-    d.appendChild(img);
+    d.appendChild(formationEl);
     d.appendChild(compIDDiv);
     
     // Add hint if available (with translation support)

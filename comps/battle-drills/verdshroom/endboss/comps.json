@@ -49,11 +49,11 @@
       "imageData": null,
       "isSubTeam": true,
       "name": "sub2_unrivaled_boss1",
+      "order": 0,
       "phantimal": {
         "name": "Skyclops",
         "tileID": "2"
-      },
-      "order": 0
+      }
     },
     {
       "artifact": {
@@ -101,12 +101,57 @@
       "imageData": null,
       "isSubTeam": true,
       "name": "sub1_unrivaled_boss1",
-      "order": 0,
+      "order": 1,
       "phantimal": {
         "name": "Skyclops",
         "tileID": 2
       },
       "subTeamId": "SUB2_UNRIVALED_BOSS1"
+    },
+    {
+      "artifact": {
+        "name": "Arcanewild",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "buffs": [
+        "unrivaled-might"
+      ],
+      "compID": "SUB1_UNRIVALED_BOSS3",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Marcille",
+          "tileID": 4
+        },
+        {
+          "name": "Cassadee",
+          "tileID": 8
+        },
+        {
+          "name": "Hugin",
+          "tileID": 9
+        },
+        {
+          "name": "Sinbad",
+          "tileID": 11
+        },
+        {
+          "name": "Ravion",
+          "tileID": 12
+        }
+      ],
+      "hint": "Best > 50%",
+      "imageData": null,
+      "isSubTeam": true,
+      "name": "sub1_unrivaled_boss3",
+      "order": 2,
+      "phantimal": {
+        "name": "Sigmund",
+        "tileID": 13
+      },
+      "subTeamId": "SUB2_UNRIVALED_BOSS3"
     },
     {
       "artifact": {
@@ -152,57 +197,12 @@
       "hint": "Best in Slot",
       "imageData": null,
       "name": "hall_boss1",
-      "order": 0,
+      "order": 3,
       "phantimal": {
         "name": "Skyclops",
         "tileID": 2
       },
       "subTeamId": "SUB1_HALL_BOSS1"
-    },
-    {
-      "artifact": {
-        "name": "Arcanewild",
-        "tileID": 14
-      },
-      "bossId": "endboss",
-      "bossType": "endboss",
-      "buffs": [
-        "unrivaled-might"
-      ],
-      "compID": "SUB1_UNRIVALED_BOSS3",
-      "enabled": true,
-      "heroes": [
-        {
-          "name": "Marcille",
-          "tileID": 4
-        },
-        {
-          "name": "Cassadee",
-          "tileID": 8
-        },
-        {
-          "name": "Hugin",
-          "tileID": 9
-        },
-        {
-          "name": "Sinbad",
-          "tileID": 11
-        },
-        {
-          "name": "Ravion",
-          "tileID": 12
-        }
-      ],
-      "hint": "Best > 50%",
-      "imageData": null,
-      "isSubTeam": true,
-      "name": "sub1_unrivaled_boss3",
-      "order": 1,
-      "phantimal": {
-        "name": "Sigmund",
-        "tileID": 13
-      },
-      "subTeamId": "SUB2_UNRIVALED_BOSS3"
     },
     {
       "artifact": {
@@ -245,7 +245,7 @@
       "hint": "Best in Slot",
       "imageData": null,
       "name": "unrivaled_boss1",
-      "order": 1,
+      "order": 4,
       "phantimal": {
         "name": "Skyclops",
         "tileID": 2
@@ -290,7 +290,7 @@
       "imageData": null,
       "isSubTeam": true,
       "name": "sub2_unrivaled_boss3",
-      "order": 2,
+      "order": 5,
       "phantimal": {
         "name": "Sigmund",
         "tileID": 12
@@ -340,7 +340,7 @@
       "hint": "Best < 50%",
       "imageData": null,
       "name": "hall_boss2",
-      "order": 2,
+      "order": 6,
       "phantimal": {
         "name": "Alpha Bear",
         "tileID": 12
@@ -383,7 +383,7 @@
       "hint": "Best > 50%",
       "imageData": null,
       "name": "hall_boss3",
-      "order": 4,
+      "order": 7,
       "phantimal": {
         "name": "Sigmund",
         "tileID": 10
@@ -430,11 +430,59 @@
       "hint": "Best < 50%",
       "imageData": null,
       "name": "unrivaled_boss2",
-      "order": 5,
+      "order": 8,
       "phantimal": {
         "name": "Alpha Bear",
         "tileID": 10
       }
+    },
+    {
+      "artifact": {
+        "name": "Starshower",
+        "tileID": 14
+      },
+      "bossId": "endboss",
+      "bossType": "endboss",
+      "buffs": [
+        "unrivaled-might"
+      ],
+      "compID": "UNRIVALED_BOSS3",
+      "enabled": true,
+      "heroes": [
+        {
+          "name": "Silven",
+          "tileID": 4
+        },
+        {
+          "name": "Cassadee",
+          "tileID": 6
+        },
+        {
+          "name": "Hugin",
+          "tileID": 9
+        },
+        {
+          "name": "Solise",
+          "replacements": [
+            "Ravion",
+            "Solise"
+          ],
+          "tileID": 12
+        },
+        {
+          "name": "Sinbad",
+          "tileID": 13
+        }
+      ],
+      "hint": "Best > 50%",
+      "imageData": null,
+      "name": "unrivaled_boss3",
+      "order": 9,
+      "phantimal": {
+        "name": "Sigmund",
+        "tileID": 7
+      },
+      "subTeamId": "SUB1_UNRIVALED_BOSS3"
     },
     {
       "artifact": {
@@ -485,59 +533,11 @@
       "imageData": null,
       "isSubTeam": true,
       "name": "sub1_hall_boss1",
-      "order": 6,
+      "order": 10,
       "phantimal": {
         "name": "Skyclops",
         "tileID": 2
       }
-    },
-    {
-      "artifact": {
-        "name": "Starshower",
-        "tileID": 14
-      },
-      "bossId": "endboss",
-      "bossType": "endboss",
-      "buffs": [
-        "unrivaled-might"
-      ],
-      "compID": "UNRIVALED_BOSS3",
-      "enabled": true,
-      "heroes": [
-        {
-          "name": "Silven",
-          "tileID": 4
-        },
-        {
-          "name": "Cassadee",
-          "tileID": 6
-        },
-        {
-          "name": "Hugin",
-          "tileID": 9
-        },
-        {
-          "name": "Solise",
-          "replacements": [
-            "Ravion",
-            "Solise"
-          ],
-          "tileID": 12
-        },
-        {
-          "name": "Sinbad",
-          "tileID": 13
-        }
-      ],
-      "hint": "Best > 50%",
-      "imageData": null,
-      "name": "unrivaled_boss3",
-      "order": 7,
-      "phantimal": {
-        "name": "Sigmund",
-        "tileID": 7
-      },
-      "subTeamId": "SUB1_UNRIVALED_BOSS3"
     },
     {
       "artifact": {
@@ -585,7 +585,7 @@
       "imageData": null,
       "isSubTeam": true,
       "name": "sub1_hall_boss3",
-      "order": 8,
+      "order": 11,
       "phantimal": {
         "name": "Sigmund",
         "tileID": 10
